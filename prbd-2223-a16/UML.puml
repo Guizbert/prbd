@@ -1,0 +1,61 @@
+@startuml vote
+' <|-- heritage
+'  ' "x" --  "x" relation 
+'  ' - relation many to many?
+'  ' .. liaison 
+
+User "1"-> "*" Choix
+Sondage "*" --> "1" User
+Sondage "*" --> "1" User 
+Sondage "1" --> "*" Choix
+Sondage "1" --> "*" Vote
+Sondage "1" --> "*" Commentaire
+Vote->User
+Vote->Choix
+Commentaire->User
+Commentaire->Sondage
+Administrateur <|-- User
+
+class User{
+    UserId: int
+    Name: string
+    Email: string
+    Password: string
+    Role: enum[user=1,admin=2]
+}
+
+class Administrateur{
+    Role: Role
+    Administrateur: User
+}
+
+class Sondage{
+    SondageId: int
+    Title: string
+    Type: string    
+    Creator: User
+    IsClosed: boolean
+    Participants: List<User>
+    Choix: List<Choix>
+    Vote: List<Vote>
+    Commentaires: List<Commentaires>
+}
+
+
+class Choix{
+    ChoixId: int
+    Libelle: string
+}
+class Vote{
+    User: User
+    Choix: Choix
+    Valeur: int
+}
+
+class Commentaire{
+    Text: string
+    Date: Datetime
+}
+
+
+@enduml
