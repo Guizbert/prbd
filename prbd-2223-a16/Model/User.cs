@@ -25,4 +25,13 @@ public class User : EntityBase<MyPollContext> {
     }
     public User() { }
 
+    /**
+     *  TODO :
+     *  
+     *      -> creer un commentaire ;
+     *      -> faire un vote ;
+     *      -> faire un choix ;
+     *      -> créer sondage ;
+     */
+
 }
