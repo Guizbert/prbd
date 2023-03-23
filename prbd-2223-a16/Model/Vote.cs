@@ -12,15 +12,23 @@ public enum VoteType {
     Yes = 1, No = -1, Maybe = 0,
 }
 
-public class Vote : EntityBase<MyPollContext> {
 
+public class Vote : EntityBase<MyPollContext>
+{
+    [ForeignKey(nameof(Choice))]
+    public int ChoiceId { get; set; }
+    public virtual Choice Choice { get; set; }
 
     [ForeignKey(nameof(User))]
     public int UserId { get; set; }
     public virtual User User { get; set; }
-
-    [ForeignKey(nameof(Choice))]
-    public int ChoiceId { get; set; }
-    public virtual Choice Choice { get; set; }
     public VoteType Type { get; set; }
+
+    public Vote(int choiceId, int userId)
+    {
+        ChoiceId = choiceId;
+        UserId = userId;
+    }
+
+    public Vote() { }
 }

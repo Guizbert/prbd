@@ -10,7 +10,7 @@ public partial class App {
 
     private static void PrepareDatabase() {
         // Clear database and seed data
-        //Context.Database.EnsureDeleted();
+        Context.Database.EnsureDeleted();
         Context.Database.EnsureCreated();
 
         // Cold start

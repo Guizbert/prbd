@@ -7,25 +7,28 @@ namespace MyPoll.Model;
 
 public class MyPollContext : DbContextBase {
     public DbSet<User> Users { get; set; }
-
+    public DbSet<Poll> Polls { get; set; }
+    public DbSet<Participation> Participations { get; set; }
+    public DbSet<Vote> Votes { get; set; }
+    public DbSet<Choice> Choices { get; set; }
+    public DbSet<Comment> Comments { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
         base.OnConfiguring(optionsBuilder);
-         optionsBuilder
+         /*optionsBuilder
               .UseSqlite("Data Source=prbd-2223-a16.db")
               .LogTo(Console.WriteLine, LogLevel.Information)
               .EnableSensitiveDataLogging()
-              .UseLazyLoadingProxies(true);
-       /* optionsBuilder
-        *     .UseSqlServer("Data Source=prbd-2223-a16.db")
+              .UseLazyLoadingProxies(true);*/
+        optionsBuilder
+            .UseSqlServer(@"Server=(localdb)\mssqllocaldb;Database=prbd-2223-a16")
               .LogTo(Console.WriteLine, LogLevel.Information)
               .EnableSensitiveDataLogging()
               .UseLazyLoadingProxies(true)
-              ;*/
+              ;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
-
        
         modelBuilder.Entity<User>()
              .HasDiscriminator(u => u.Role)
@@ -41,11 +44,11 @@ public class MyPollContext : DbContextBase {
             .UsingEntity(j => j.ToTable("Participation"));
 
 
-        modelBuilder.Entity<User>()
+        /*modelBuilder.Entity<User>()
                 .HasMany(u => u.Choices)
                 .WithOne(c => c.User)
                 .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Cascade);*/
 
 
         modelBuilder.Entity<User>()
@@ -104,7 +107,7 @@ public class MyPollContext : DbContextBase {
         modelBuilder.Entity<Participation>()
             .HasKey(p => new { p.PollId, p.UserId });
 
-        modelBuilder.Entity<Participation>()
+       /* modelBuilder.Entity<Participation>()
             .HasOne(p => p.Poll)
             .WithMany(p => p.Participations)
             .HasForeignKey(p => p.PollId)
@@ -114,15 +117,33 @@ public class MyPollContext : DbContextBase {
             .HasOne(p => p.User)
             .WithMany(u => u.UserParticipants)
             .HasForeignKey(p => p.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Cascade);*/
 
         // --------
 
         modelBuilder.Entity<Vote>()
             .HasKey(v => new { v.UserId, v.ChoiceId });
 
+        modelBuilder.Entity<Choice>()
+            .HasOne(c => c.Poll)
+            .WithMany(p => p.Choices)
+            .HasForeignKey(c => c.PollId)
+            .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<Vote>()
+            .HasKey(v => new { v.UserId, v.ChoiceId });
 
+        modelBuilder.Entity<Vote>()
+            .HasOne(v => v.Choice)
+            .WithMany(c => c.Votes)
+            .HasForeignKey(v => v.ChoiceId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Vote>()
+            .HasOne(v => v.User)
+            .WithMany(u => u.Votes)
+            .HasForeignKey(v => v.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         /*//un choix : 
         modelBuilder.Entity<Choice>()
@@ -141,7 +162,9 @@ public class MyPollContext : DbContextBase {
 
         SeedData(modelBuilder);
     }
+    //user, admin, poll, comment et participation sont bon.
 
+    //choice et vote sont faux
     private static void SeedData(ModelBuilder modelBuilder) {
         modelBuilder.Entity<User>()
      .HasData(
@@ -332,5 +355,6 @@ public class MyPollContext : DbContextBase {
                 new Participation { PollId = 6, UserId = 7 },
                 new Participation { PollId = 6, UserId = 8 }
             );
+       
     }
 }
