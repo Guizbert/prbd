@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -7,20 +8,16 @@ using System.Threading.Tasks;
 using PRBD_Framework;
 
 namespace MyPoll.Model;
-
-public enum VoteType {
-    Yes = 1, No = -1, Maybe = 0,
-}
-
-public class Vote : EntityBase<MyPollContext> {
+public class Participation : EntityBase<MyPollContext> {
 
 
-    [ForeignKey(nameof(User))]
+    public int PollId { get; set; }
+
     public int UserId { get; set; }
+
+    public virtual Poll Poll { get; set; }
     public virtual User User { get; set; }
 
-    [ForeignKey(nameof(Choice))]
-    public int ChoiceId { get; set; }
-    public virtual Choice Choice { get; set; }
-    public VoteType Type { get; set; }
+
 }
+

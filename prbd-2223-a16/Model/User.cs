@@ -9,8 +9,8 @@ public enum Role {
 }
 public class User : EntityBase<MyPollContext> {
 
-    public int UserId { get; set; }
-    public string Name { get; set; }
+    public int Id { get; set; }
+    public string FullName { get; set; }
 
     public string Email { get; set; }
 
@@ -18,8 +18,14 @@ public class User : EntityBase<MyPollContext> {
 
     public Role Role { get; protected set; } = Role.Member;
 
-    public User(string name, string email, string password) {
-        Name = name;
+    public virtual ICollection<Choice> Choices { get; set; } = new HashSet<Choice>();
+    public virtual ICollection<Vote> Votes{ get; set; } = new HashSet<Vote>();
+    public virtual ICollection<Poll> UserPolls{ get; set; } = new HashSet<Poll>();
+    public virtual ICollection<Participation> UserParticipants{ get; set; } = new HashSet<Participation>();
+    public virtual ICollection<Comment> Comments{ get; set; } = new HashSet<Comment>();
+
+    public User(string fullName, string email, string password) {
+        FullName = fullName;
         Email = email;
         Password = password;
     }
