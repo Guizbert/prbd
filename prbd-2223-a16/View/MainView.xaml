@@ -8,12 +8,11 @@
               d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
               mc:Ignorable="d"
               WindowStartupLocation="CenterScreen"
-              Title="MyPoll - prbd-2223-a16"
+              Title="My polls"
               Height="400" Width="600">
     <Window.DataContext>
-        <vm:MainViewModel x:Name="vm"/>
+        <vm:MainViewModel/>
     </Window.DataContext>
-    <TextBlock Text="{Binding Title}"
-               VerticalAlignment="Center" HorizontalAlignment="Center"
-               FontSize="40" FontFamily="Comic Sans MS"/>
+    
+    
 </f:WindowBase>

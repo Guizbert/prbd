@@ -6,12 +6,12 @@ using PRBD_Framework;
 namespace MyPoll.Model;
 
 public class MyPollContext : DbContextBase {
-    public DbSet<User> Users { get; set; }
-    public DbSet<Poll> Polls { get; set; }
-    public DbSet<Participation> Participations { get; set; }
-    public DbSet<Vote> Votes { get; set; }
-    public DbSet<Choice> Choices { get; set; }
-    public DbSet<Comment> Comments { get; set; }
+    public DbSet<User> Users => Set<User>();
+    public DbSet<Poll> Polls => Set<Poll>();
+    public DbSet<Participation> Participations => Set<Participation>();
+    public DbSet<Vote> Votes => Set<Vote>();
+    public DbSet<Choice> Choices => Set<Choice>();
+    public DbSet<Comment> Comments => Set<Comment>();
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
         base.OnConfiguring(optionsBuilder);
          /*optionsBuilder
@@ -50,16 +50,17 @@ public class MyPollContext : DbContextBase {
                 .HasForeignKey(c => c.UserId)
                 .OnDelete(DeleteBehavior.Cascade);*/
 
+       
 
         modelBuilder.Entity<User>()
             .HasMany(u => u.UserPolls)
             .WithMany(p => p.Participants)
             .UsingEntity<Participation>(
                p => p.HasOne(p => p.Poll)
-                    .WithMany(p => p.Participations)
+                    .WithMany()
                     .HasForeignKey(p => p.PollId),
                p => p.HasOne(p => p.User)
-                    .WithMany(u => u.UserParticipants)
+                    .WithMany()
                     .HasForeignKey(p => p.UserId),
 
                p => {
@@ -162,9 +163,7 @@ public class MyPollContext : DbContextBase {
 
         SeedData(modelBuilder);
     }
-    //user, admin, poll, comment et participation sont bon.
 
-    //choice et vote sont faux
     private static void SeedData(ModelBuilder modelBuilder) {
         modelBuilder.Entity<User>()
      .HasData(

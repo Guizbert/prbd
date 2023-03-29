@@ -11,7 +11,7 @@ using PRBD_Framework;
 namespace MyPoll.Model;
 
 public enum PollType {
-    Single, Multiple,
+     Multiple, Single
 }
 
 public class Poll : EntityBase<MyPollContext> {
@@ -19,14 +19,13 @@ public class Poll : EntityBase<MyPollContext> {
     public string Name { get; set; }
 
     public PollType Type { get; set; }
+
+    [ForeignKey(nameof(Creator))]
     public int CreatorId { get; set; }
 
+    public User Creator { get; set; }
     public bool Closed { get; set; }
     public virtual ICollection<User> Participants { get; set; }
-    public virtual ICollection<Participation> Participations{ get; set; }
-
-    public virtual ICollection<Vote> Vote { get; set; }
-
     public virtual ICollection<Choice> Choices { get; set; }
 
     public virtual ICollection<Comment> commentaires { get; set; }

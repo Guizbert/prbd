@@ -9,7 +9,7 @@ using PRBD_Framework;
 namespace MyPoll.Model;
 
 public enum VoteType {
-    Yes = 1, No = -1, Maybe = 0,
+    Yes = 1, No = -1, Maybe = 1/2,
 }
 
 
