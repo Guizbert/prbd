@@ -1,4 +1,5 @@
-﻿using System.DirectoryServices.ActiveDirectory;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.DirectoryServices.ActiveDirectory;
 using PRBD_Framework;
 
 namespace MyPoll.Model;
@@ -20,6 +21,10 @@ public class User : EntityBase<MyPollContext> {
 
     public virtual ICollection<Vote> Votes{ get; set; } = new HashSet<Vote>();
     public virtual ICollection<Poll> UserPolls{ get; set; } = new HashSet<Poll>();
+
+    [InverseProperty(nameof(Poll.Creator))]
+    public virtual ICollection<Poll> participatingIn{ get; set; } = new HashSet<Poll>();
+    //2e iColl de poll pour les participations;
     public virtual ICollection<Comment> Comments{ get; set; } = new HashSet<Comment>();
 
     public User(string fullName, string email, string password) {

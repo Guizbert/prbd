@@ -27,6 +27,10 @@ public partial class App : ApplicationBase<User, MyPollContext > {
             Login(user);
             NavigateTo<MainViewModel, User, MyPollContext>();
         });
+        Register<User>(this, Messages.MSG_NEW_MEMBER, user => {
+            Login(user);
+            NavigateTo<MainViewModel, User, MyPollContext>();
+        });
     }
 
     private static void PrepareDatabase() {

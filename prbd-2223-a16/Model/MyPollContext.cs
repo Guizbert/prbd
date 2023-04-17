@@ -38,6 +38,7 @@ public class MyPollContext : DbContextBase {
         modelBuilder.Entity<Administrator>()
             .HasBaseType<User>();
 
+
         modelBuilder.Entity<User>()
             .HasMany(u => u.UserPolls)
             .WithMany(p => p.Participants)
@@ -58,17 +59,29 @@ public class MyPollContext : DbContextBase {
             .UsingEntity<Participation>(
                p => p.HasOne(p => p.Poll)
                     .WithMany()
-                    .HasForeignKey(p => p.PollId),
+                    .HasForeignKey(p => p.PollId)
+                    .OnDelete(DeleteBehavior.ClientCascade),
                p => p.HasOne(p => p.User)
                     .WithMany()
                     .HasForeignKey(p => p.UserId),
-
                p => {
                    p.HasKey(p => new { p.PollId, p.UserId });
                }
 
             );
-      //------------
+
+
+        modelBuilder.Entity<User>()
+            .HasMany(u => u.Comments)
+            .WithOne(co => co.Creator)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+        //------------
+
+
+        modelBuilder.Entity<Poll>()
+            .HasOne(p => p.Creator);
 
         modelBuilder.Entity<Poll>()
             .HasKey(p => p.Id);
@@ -95,6 +108,12 @@ public class MyPollContext : DbContextBase {
             .HasKey(c => c.Id);
 
         modelBuilder.Entity<Comment>()
+            .HasOne(c => c.Creator)
+            .WithMany(u => u.Comments)
+            .HasForeignKey(c => c.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<Comment>()
             .Property(c => c.Text)
             .IsRequired();
 
@@ -102,23 +121,23 @@ public class MyPollContext : DbContextBase {
             .HasOne(c => c.Poll)
             .WithMany(p => p.commentaires)
             .HasForeignKey(c => c.PollId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.NoAction);
 
         // -----------
         modelBuilder.Entity<Participation>()
             .HasKey(p => new { p.PollId, p.UserId });
 
-       /* modelBuilder.Entity<Participation>()
-            .HasOne(p => p.Poll)
-            .WithMany(p => p.Participations)
-            .HasForeignKey(p => p.PollId)
-            .OnDelete(DeleteBehavior.Cascade);
+        /* modelBuilder.Entity<Participation>()
+             .HasOne(p => p.Poll)
+             .WithMany(p => p.Participations)
+             .HasForeignKey(p => p.PollId)
+             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<Participation>()
-            .HasOne(p => p.User)
-            .WithMany(u => u.UserParticipants)
-            .HasForeignKey(p => p.UserId)
-            .OnDelete(DeleteBehavior.Cascade);*/
+         modelBuilder.Entity<Participation>()
+             .HasOne(p => p.User)
+             .WithMany(u => u.UserParticipants)
+             .HasForeignKey(p => p.UserId)
+             .OnDelete(DeleteBehavior.Cascade);*/
 
         // --------
 
@@ -137,29 +156,14 @@ public class MyPollContext : DbContextBase {
         modelBuilder.Entity<Vote>()
             .HasOne(v => v.Choice)
             .WithMany(c => c.Votes)
-            .HasForeignKey(v => v.ChoiceId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(v => v.ChoiceId);
+            //.OnDelete(DeleteBehavior.NoAction);
 
         modelBuilder.Entity<Vote>()
             .HasOne(v => v.User)
             .WithMany(u => u.Votes)
             .HasForeignKey(v => v.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        /*//un choix : 
-        modelBuilder.Entity<Choice>()
-        //fait parti d'un poll
-        .HasOne(c => c.Poll)
-        // le poll a plusieurs choix
-        .WithMany(p => p.Choices)
-        .HasForeignKey(c => c.PollId);
-
-        // entité User qui utilise le role comme disciminateur
-        //en mappant Role.Member avec Role.Administrator du type admin
-        modelBuilder.Entity<User>()
-            .HasDiscriminator(u => u.Role)
-            .HasValue<User>(Role.Member)
-            .HasValue<Administrator>(Role.Administrator);*/
+            .OnDelete(DeleteBehavior.NoAction);
 
         SeedData(modelBuilder);
     }

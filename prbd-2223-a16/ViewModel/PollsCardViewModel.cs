@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MyPoll.Model;
 
 namespace MyPoll.ViewModel;
+
 public class PollsCardViewModel : ViewModelCommon
 {
     private readonly Poll _poll;
@@ -16,28 +17,15 @@ public class PollsCardViewModel : ViewModelCommon
         private init => SetProperty(ref _poll, value);
     }
 
-    public string name => Poll.Name;
-
+    public string Name => Poll.Name;
     public PollType Type => Poll.Type;
+    public string Creator => Poll.Creator.FullName;
+    public int Participants => Poll.Participants.Count;
+    public int Votes => Poll.Choices.Count;
+    public string BestChoice => Poll.BestChoice;
 
-
-    //binder dans la vue avec le creator.name
-
-
-    /*
-
-      public string Name { get; set; }
-
-public PollType Type { get; set; }
-
-
-public int CreatorId { get; set; }
-public bool Closed { get; set; }
-public virtual ICollection<User> Participants { get; set; }
-public virtual ICollection<Choice> Choices { get; set; }
-
-public virtual ICollection<Comment> commentaires { get; set; }
-
-public Poll( int id, string na*/
+    public PollsCardViewModel(Poll poll) {
+        Poll = poll;
+    }
 }
 

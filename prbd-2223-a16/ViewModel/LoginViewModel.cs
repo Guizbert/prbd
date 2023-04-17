@@ -4,13 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Controls;
+using System.Windows;
 using System.Windows.Input;
 using MyPoll.Model;
+using MyPoll.View;
 using PRBD_Framework;
 
 namespace MyPoll.ViewModel;
 public class LoginViewModel : ViewModelCommon {
     public ICommand LoginCommand { get; set; }
+
+    public ICommand OpenSignUpCommand { get; }
     private string _email;
     private string _password;
 
@@ -26,13 +31,25 @@ public class LoginViewModel : ViewModelCommon {
     public LoginViewModel() : base() {
         LoginCommand = new RelayCommand(LoginAction,
             () => { return _email != null && _password != null && !HasErrors; });
+       
+
+        OpenSignUpCommand = new RelayCommand(OpenSignUp);
     }
     private void LoginAction() {
         if (Validate()) {
             var user = Context.Users.SingleOrDefault(user => user.Email == Email);
-
-            NotifyColleagues(App.Messages.MSG_LOGIN, user);
+            if(user != null) {
+                NotifyColleagues(App.Messages.MSG_LOGIN, user);
+            }
         }
+    }
+    private void OpenSignUp() {
+        var signupView = new SignUpView();
+        var loginWindow = App.Current.Windows.OfType<LoginView>().FirstOrDefault();
+        if(loginWindow != null) {
+            loginWindow.Close();
+        }
+        signupView.Show();
     }
 
     public override bool Validate() {
@@ -45,13 +62,16 @@ public class LoginViewModel : ViewModelCommon {
 
     public bool ValidateEmail() {
         var user = Context.Users.SingleOrDefault(user => user.Email == Email);
-        /*Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
+        Regex regex = new Regex(@"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$");
         Match match = regex.Match(Email);
         if (!match.Success) {
             AddError(nameof(Email), "email incorrect");
-        }*/
+        }
         if (string.IsNullOrEmpty(Email))
             AddError(nameof(Email), "required");
+        if (user == null) {
+            AddError(nameof(Email), "n'existes pas ");
+        }
         return !HasErrors;
     }
     public bool ValidatePassword() {
@@ -65,6 +85,29 @@ public class LoginViewModel : ViewModelCommon {
         return !HasErrors;
     }
     protected override void OnRefreshData() {
+    }
+
+    private void LoginAsUser_Click(object sender, RoutedEventArgs e) {
+        Button button = sender as Button;
+        switch (button.Tag.ToString()) {
+            case "harry":
+                Email= "harry@test.com";
+                Password= "harry";
+                break;
+            case "john":
+                Email = "john@test.com";
+                Password= "john";
+                break;
+            default:
+                break;
+        }
+        LoginCommand.Execute(null);
+    }
+
+    private void LoginAsAdmin_Click(object sender, RoutedEventArgs e) {
+        Email= "admin@test.com";
+        Password = "admin";
+        LoginCommand.Execute(null);
     }
 }
 

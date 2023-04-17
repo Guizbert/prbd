@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Castle.Components.DictionaryAdapter;
 using PRBD_Framework;
 
 namespace MyPoll.Model;
@@ -15,16 +14,24 @@ public enum PollType {
 }
 
 public class Poll : EntityBase<MyPollContext> {
+
+    [Key]
     public int Id { get; set; }
+
+    [Required]
     public string Name { get; set; }
 
+    [Required]
     public PollType Type { get; set; }
 
-    [ForeignKey(nameof(Creator))]
+    [Required ,ForeignKey(nameof(Creator))]
     public int CreatorId { get; set; }
 
-    public User Creator { get; set; }
+    public virtual User Creator { get; set; }
     public bool Closed { get; set; }
+
+    public string BestChoice => getBestChoice(this);
+
     public virtual ICollection<User> Participants { get; set; }
     public virtual ICollection<Choice> Choices { get; set; }
 
@@ -44,5 +51,16 @@ public class Poll : EntityBase<MyPollContext> {
     }
 
     public Poll() { }
+
+
+    private string getBestChoice(Poll poll) {
+        var bestChoice = from c in Context.Choices
+                             // faire un where pour check le tricount
+                         where c.PollId == poll.Id
+                         orderby c.Votes descending
+                         select c.Label;
+        var bestc = bestChoice.FirstOrDefault();
+        return bestc;
+    }
 }
 
