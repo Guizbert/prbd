@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using PRBD_Framework;
 
 namespace MyPoll.Model;
@@ -30,7 +31,7 @@ public class Poll : EntityBase<MyPollContext> {
     public virtual User Creator { get; set; }
     public bool Closed { get; set; }
 
-    public string BestChoice => getBestChoice(this);
+    //public string BestChoice => getBestChoice(this);
 
     public virtual ICollection<User> Participants { get; set; }
     public virtual ICollection<Choice> Choices { get; set; }
@@ -53,14 +54,36 @@ public class Poll : EntityBase<MyPollContext> {
     public Poll() { }
 
 
-    private string getBestChoice(Poll poll) {
-        var bestChoice = from c in Context.Choices
-                             // faire un where pour check le tricount
-                         where c.PollId == poll.Id
-                         orderby c.Votes descending
-                         select c.Label;
-        var bestc = bestChoice.FirstOrDefault();
-        return bestc;
+    [NotMapped]
+    public IEnumerable<Choice> BestChoice {
+        get {
+            if (Choices.Count == 0) return new List<Choice>();
+            var maxScore = Choices.Select(c => c.Votes.Sum(v => v.Value)).Max();
+            if (maxScore == 0) return new List<Choice>();
+            var choices = Choices.Where(c => c.Votes.Sum(v => v.Value) == maxScore).ToList();
+
+            //var choices = Context.Choices
+            //.Include(c => c.Votes)
+            //.Where(c => c.PollId == poll.Id)
+            //.OrderByDescending(c => c.Votes.Count())
+            //.ToList();
+
+            //return choices.FirstOrDefault()?.Label;
+            return choices;
+        }
+    }
+
+    public int GetTotalVote {
+        get{
+            return Choices.Sum(choice => choice.Votes.Count);
+        }
+    }
+    public static IQueryable<Poll> GetPolls(User CurrentUser) {
+        var allPolls = (Context.Polls
+            .Where(poll => poll.Creator.Email.Contains(CurrentUser.Email) ||
+                    poll.Participants.Contains(CurrentUser))
+            .OrderBy(poll => poll.Name));
+       return allPolls;
     }
 }
 

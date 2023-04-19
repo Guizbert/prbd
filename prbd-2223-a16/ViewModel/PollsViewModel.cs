@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Windows.Input;
 using MyPoll.Model;
 using PRBD_Framework;
@@ -17,15 +18,17 @@ public class PollsViewModel : ViewModelCommon
 
     public string Filter {
         get => _filter;
-        set=> SetProperty(ref _filter, value);
+        set=> SetProperty(ref _filter, value, ApplyFilterAction);
     }
     public ICommand ClearFilter { get; set; }
+    public ICommand ApplyFilter { get; set; }
     public ICommand NewPoll{ get; set;}
 
 
 
     public PollsViewModel() : base() {
-        ApplyFilterAction();
+        getPolls();
+        ApplyFilter = new RelayCommand(ApplyFilterAction);
         ClearFilter = new RelayCommand(() => Filter = "");
 
         NewPoll = new RelayCommand(() => {
@@ -35,17 +38,40 @@ public class PollsViewModel : ViewModelCommon
 
     }
 
+    private void getPolls() {
+        IQueryable<Poll> polls = Poll.GetPolls(CurrentUser);
+
+        Polls = new ObservableCollection<PollsCardViewModel>(
+            polls.Select(p => new PollsCardViewModel(p)));
+
+        //if(Polls != null)
+        //    Polls.Clear();
+        //foreach(var allPolls in polls) {
+        //    var pollCard = new PollsCardViewModel(allPolls);
+        //    Polls.Add(pollCard);
+        //}
+    }
     private void ApplyFilterAction() {
-        IEnumerable<Poll> query = Context.Polls.OrderBy(p => p.Id);
-        if(!string.IsNullOrEmpty(Filter) ) {
+
+        if (!string.IsNullOrEmpty(Filter)) {
+            var filter = new ObservableCollection<PollsCardViewModel>
+                        (Context.Polls
+                        .Where(p => p.Name.Contains(Filter) || p.Participants.Any(parti => parti.FullName.Contains(Filter))
+                        || p.Choices.Any(c => c.Label.Contains(Filter)))
+                        .Select(p => new PollsCardViewModel(p)));
+            Polls = filter;
+        }
+        /*
+        IEnumerable<Poll> query = Context.Polls.OrderBy(p => p.Name);
+
             query = from p in Context.Polls
-                    where p.Name.Contains(Filter)
+                    where p.Name.Contains(Filter) || p.BestChoice.Contains(Filter) || p.Creator.FullName.Contains(Filter)
                     orderby p.Name
                     select p;
-        }
         Polls = new ObservableCollection<PollsCardViewModel>(query.Select(p => new PollsCardViewModel(p)));
-
+        */
     }
+
     protected override void OnRefreshData() {
         // pour plus tard
     }

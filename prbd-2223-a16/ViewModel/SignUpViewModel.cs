@@ -52,7 +52,12 @@ class SignUpViewModel : ViewModelCommon {
                 Password = SecretHasher.Hash(Password));
             Context.Users.Add(newUser);
             Context.SaveChanges();
+            var signUpWindow = App.Current.Windows.OfType<SignUpView>().FirstOrDefault();
+            
             NotifyColleagues(App.Messages.MSG_NEW_MEMBER, newUser);
+            if (signUpWindow != null) {
+                signUpWindow.Close();
+            }
         }
     }
 
