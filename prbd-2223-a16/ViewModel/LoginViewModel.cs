@@ -45,11 +45,16 @@ public class LoginViewModel : ViewModelCommon {
     }
     private void OpenSignUp() {
         var signupView = new SignUpView();
-        var loginWindow = App.Current.Windows.OfType<LoginView>().FirstOrDefault();
-        if(loginWindow != null) {
-            loginWindow.Close();
-        }
-        signupView.Show();
+        // TODO : 
+        // envoyer un App.Message et navigateTo signupView
+
+
+        //var loginWindow = App.Current.Windows.OfType<LoginView>().FirstOrDefault();
+        //if(loginWindow != null) {
+        //    loginWindow.Close();
+        //}
+        //signupView.Show();
+        NotifyColleagues(App.Messages.MSG_NEW_MEMBER, new User());
     }
 
     public override bool Validate() {

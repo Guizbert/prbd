@@ -28,6 +28,11 @@ public partial class App : ApplicationBase<User, MyPollContext > {
             NavigateTo<MainViewModel, User, MyPollContext>();
         });
         Register<User>(this, Messages.MSG_NEW_MEMBER, user => {
+            //Login(user);
+            NavigateTo<SignUpViewModel, User, MyPollContext>();
+        });
+
+        Register<User>(this, Messages.MSG_NEW_MEMBER, user => {
             Login(user);
             NavigateTo<MainViewModel, User, MyPollContext>();
         });
@@ -35,7 +40,7 @@ public partial class App : ApplicationBase<User, MyPollContext > {
 
     private static void PrepareDatabase() {
         // Clear database and seed data
-        Context.Database.EnsureDeleted();
+        //Context.Database.EnsureDeleted();
         Context.Database.EnsureCreated();
 
         // Cold start
