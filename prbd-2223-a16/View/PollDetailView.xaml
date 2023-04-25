@@ -20,6 +20,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Title}"/>
             <TextBox Text="{Binding Filter, UpdateSourceTrigger=PropertyChanged}" FontSize="14" />
             <Button Content="Clear" Grid.Column="1" Command="{Binding ClearFilter}" Margin="5,0,0,0" Height="20" VerticalAlignment="Top" />
         </Grid>

@@ -34,6 +34,8 @@ public class User : EntityBase<MyPollContext> {
     }
     public User() { }
 
+
+    public bool isAdmin() { return this.Role == Role.Administrator; }
     /**
      *  TODO :
      *  

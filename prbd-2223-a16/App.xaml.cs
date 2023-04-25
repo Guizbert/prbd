@@ -10,14 +10,18 @@ public partial class App : ApplicationBase<User, MyPollContext > {
     public enum Messages {
         MSG_NEW_MEMBER,
         MSG_CREATE_POLL,
+        MSG_DISPLAY_POLL,
         MSG_DELETE_POLL,
         MSG_UPDATE_POLL,
+
         MSG_CREATE_COMMENT,
         MSG_DELETE_COMMENT,
         MSG_UPDATE_COMMENT,
+
         MSG_CREATE_VOTE,
         MSG_DELETE_VOTE,
         MSG_UPDATE_VOTE,
+
         MSG_CLOSE_TAB,
         MSG_LOGIN
     }
@@ -36,6 +40,7 @@ public partial class App : ApplicationBase<User, MyPollContext > {
             Login(user);
             NavigateTo<MainViewModel, User, MyPollContext>();
         });
+        
     }
 
     private static void PrepareDatabase() {

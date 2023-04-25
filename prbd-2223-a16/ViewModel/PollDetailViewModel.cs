@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using MyPoll.Model;
+using PRBD_Framework;
 
 namespace MyPoll.ViewModel;
 
@@ -60,8 +61,55 @@ internal class PollDetailViewModel : ViewModelCommon {
     }
 
     
-    public PollDetailViewModel() { }
+    public PollDetailViewModel(Poll poll, bool isNew)
+    {
+        Poll = poll;
+        IsNew= isNew;
 
+        Save = new RelayCommand(SaveAction, CanSaveAction);
+        Cancel = new RelayCommand(CancelAction, CanCancelAction);
+        Delete = new RelayCommand(DeleteAction, () => !IsNew);
+
+        RaisePropertyChanged();
+
+    }
+
+    public override void SaveAction()
+    {
+        if (IsNew) {
+            Context.Add(Poll);
+            IsNew = false;
+        }
+        Context.SaveChanges();
+        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+
+    }
+
+    private bool CanSaveAction() {
+        if (IsNew) 
+            return !string.IsNullOrEmpty(Title);
+        return Poll != null && Poll.IsModified;
+
+    }
+
+    public override void CancelAction() {
+        if (IsNew) {
+            IsNew = false;
+            NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
+        } else {
+            Poll.Reload();
+            RaisePropertyChanged();
+        }
+    }
+    private bool CanCancelAction() {
+        return Poll != null && (IsNew || Poll.IsModified);
+    }
+    private void DeleteAction() {
+        CancelAction();
+        Poll.Delete();
+        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+        NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
+    }
 
 }
 

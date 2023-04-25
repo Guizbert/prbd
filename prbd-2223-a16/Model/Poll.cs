@@ -85,5 +85,16 @@ public class Poll : EntityBase<MyPollContext> {
             .OrderBy(poll => poll.Name));
        return allPolls;
     }
+
+   
+    public void Delete() {
+        // doit delete les choix, vote, ?
+        Choices.Clear();
+        Participants.Clear();
+        commentaires.Clear();
+
+        Context.Polls.Remove(this);
+        Context.SaveChanges();
+    }
 }
 

@@ -47,13 +47,6 @@ public class LoginViewModel : ViewModelCommon {
         var signupView = new SignUpView();
         // TODO : 
         // envoyer un App.Message et navigateTo signupView
-
-
-        //var loginWindow = App.Current.Windows.OfType<LoginView>().FirstOrDefault();
-        //if(loginWindow != null) {
-        //    loginWindow.Close();
-        //}
-        //signupView.Show();
         NotifyColleagues(App.Messages.MSG_NEW_MEMBER, new User());
     }
 
@@ -107,12 +100,14 @@ public class LoginViewModel : ViewModelCommon {
                 break;
         }
         LoginCommand.Execute(null);
+        LoginAction();
     }
 
     private void LoginAsAdmin_Click(object sender, RoutedEventArgs e) {
         Email= "admin@test.com";
         Password = "admin";
         LoginCommand.Execute(null);
+        LoginAction();
     }
 }
 

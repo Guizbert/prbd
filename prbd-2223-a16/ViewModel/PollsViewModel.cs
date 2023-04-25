@@ -54,13 +54,22 @@ public class PollsViewModel : ViewModelCommon
     private void ApplyFilterAction() {
 
         if (!string.IsNullOrEmpty(Filter)) {
-            var filter = new ObservableCollection<PollsCardViewModel>
-                        (Context.Polls
-                        .Where(p => p.Name.Contains(Filter) || p.Participants.Any(parti => parti.FullName.Contains(Filter))
-                        || p.Choices.Any(c => c.Label.Contains(Filter)))
-                        .Select(p => new PollsCardViewModel(p)));
+            IQueryable<Poll> query = Context.Polls;
+
+            if (!CurrentUser.isAdmin()) // vérifiez si l'utilisateur est un administrateur
+            {
+                query = query.Where(p => p.Participants.Any(parti => parti.Id == CurrentUser.Id)); // filtrez les sondages en fonction de l'utilisateur connecté
+            }
+
+            query = query.Where(p => p.Name.Contains(Filter) || p.Participants.Any(parti => parti.FullName.Contains(Filter) || p.Creator.FullName.Contains(Filter))
+            || p.Choices.Any(c => c.Label.Contains(Filter)));
+
+            var filter = new ObservableCollection<PollsCardViewModel>(
+                query.Select(p => new PollsCardViewModel(p)));
+
             Polls = filter;
         }
+
         /*
         IEnumerable<Poll> query = Context.Polls.OrderBy(p => p.Name);
 
