@@ -73,6 +73,21 @@ public class Poll : EntityBase<MyPollContext> {
         }
     }
 
+    //[NotMapped]
+    //public static IEnumerable<string> AllUsers {
+    //    get {
+    //        return Participants.Select(p => p.FullName);
+    //    }
+    //}
+
+    [NotMapped]
+    public static IEnumerable<User> AllUsers {
+        get {
+            var user = Context.Users;
+            return user.ToList();
+        }
+    }
+
     public int GetTotalVote {
         get{
             return Choices.Sum(choice => choice.Votes.Count);

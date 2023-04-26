@@ -50,6 +50,12 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(ref _isClosed, value);
     }
 
+
+    public IEnumerable<User> AllParticipants {
+        get {
+            return Poll.AllUsers;
+        }
+    }
     public static PollType[] getTypevalues => Poll.getTypes();
 
     private PollType _selectedPollType;
@@ -62,7 +68,18 @@ internal class PollDetailViewModel : ViewModelCommon {
         }
     }
 
-    
+    private string _selectedUser;
+
+    public string SelectedUser {
+        get => _selectedUser;
+        set {
+            _selectedUser = value;
+            RaisePropertyChanged(nameof(SelectedUser));
+        }
+    }
+
+
+
     public PollDetailViewModel(Poll poll, bool isNew)
     {
         Poll = poll;
