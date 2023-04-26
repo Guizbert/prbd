@@ -33,7 +33,6 @@ internal class PollDetailViewModel : ViewModelCommon {
         get => _isNew;
         set => SetProperty(ref _isNew, value);
     }
-    private string _title;
     public string Title {
         get => Poll.Name;
         set => SetProperty(Poll.Name, value, Poll, (t, v) => {
@@ -42,10 +41,8 @@ internal class PollDetailViewModel : ViewModelCommon {
         });
     }
 
-    private string _creator;
     public string Creator {
-        get => _creator;
-        set => SetProperty(ref _creator, value);
+        get => $"(Created by {CurrentUser.FullName})";
     }
     private bool _isClosed;
     public bool IsClosed {
@@ -53,11 +50,16 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(ref _isClosed, value);
     }
 
-    private PollType _pollType;
+    public static PollType[] getTypevalues => Poll.getTypes();
 
-    public PollType PollType {
-        get => _pollType;
-        set => SetProperty(ref _pollType, value);
+    private PollType _selectedPollType;
+
+    public PollType SelectedPollType {
+        get => _selectedPollType;
+        set {
+            _selectedPollType = value;
+            RaisePropertyChanged(nameof(SelectedPollType));
+        }
     }
 
     
@@ -65,7 +67,6 @@ internal class PollDetailViewModel : ViewModelCommon {
     {
         Poll = poll;
         IsNew= isNew;
-
         Save = new RelayCommand(SaveAction, CanSaveAction);
         Cancel = new RelayCommand(CancelAction, CanCancelAction);
         Delete = new RelayCommand(DeleteAction, () => !IsNew);

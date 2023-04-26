@@ -30,7 +30,7 @@ public class PollsViewModel : ViewModelCommon
         getPolls();
         ApplyFilter = new RelayCommand(ApplyFilterAction);
         ClearFilter = new RelayCommand(() => Filter = "");
-
+        OnRefreshData();
         NewPoll = new RelayCommand(() => {
             NotifyColleagues(App.Messages.MSG_CREATE_POLL, new Poll());
         });
@@ -82,7 +82,8 @@ public class PollsViewModel : ViewModelCommon
     }
 
     protected override void OnRefreshData() {
-        // pour plus tard
+        Polls.Clear();
+        getPolls();
     }
 }
 

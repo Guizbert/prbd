@@ -89,24 +89,21 @@ public class LoginViewModel : ViewModelCommon {
         Button button = sender as Button;
         switch (button.Tag.ToString()) {
             case "harry":
-                Email= "harry@test.com";
-                Password= "harry";
+                LoginCommand.Execute("harry@test.com");
                 break;
             case "john":
-                Email = "john@test.com";
-                Password= "john";
+                LoginCommand.Execute("john@test.com");
                 break;
             default:
                 break;
         }
-        LoginCommand.Execute(null);
-        LoginAction();
+        LoginCommand.Execute(button);
     }
 
     private void LoginAsAdmin_Click(object sender, RoutedEventArgs e) {
         Email= "admin@test.com";
         Password = "admin";
-        LoginCommand.Execute(null);
+        LoginCommand.Execute("admin@test.com");
         LoginAction();
     }
 }

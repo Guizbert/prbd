@@ -39,6 +39,9 @@ public partial class MainView : WindowBase {
             tab.Tag = header;
         }
     }
+    private void MenuLogout_Click(object sender, System.Windows.RoutedEventArgs e) {
+        NotifyColleagues(App.Messages.MSG_LOGOUT);
+    }
 
     private void DoCloseTab(Poll poll) {
         tabControl.CloseByTag(string.IsNullOrEmpty(poll.Name) ? "<New Poll>" : poll.Name);

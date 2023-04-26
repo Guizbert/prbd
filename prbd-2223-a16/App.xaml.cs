@@ -6,7 +6,7 @@ using PRBD_Framework;
 namespace MyPoll; 
 
 public partial class App : ApplicationBase<User, MyPollContext > {
-
+    // TODO : afficher les best choices
     public enum Messages {
         MSG_NEW_MEMBER,
         MSG_CREATE_POLL,
@@ -23,7 +23,9 @@ public partial class App : ApplicationBase<User, MyPollContext > {
         MSG_UPDATE_VOTE,
 
         MSG_CLOSE_TAB,
-        MSG_LOGIN
+        MSG_LOGIN,
+        MSG_LOGOUT,
+        MSG_REFRESH_DATA
     }
     protected override void OnStartup(StartupEventArgs e) {
         PrepareDatabase();
@@ -35,7 +37,10 @@ public partial class App : ApplicationBase<User, MyPollContext > {
             //Login(user);
             NavigateTo<SignUpViewModel, User, MyPollContext>();
         });
-
+        Register(this, Messages.MSG_LOGOUT, () => {
+            Logout();
+            NavigateTo<LoginViewModel, User, MyPollContext>();
+        });
         Register<User>(this, Messages.MSG_NEW_MEMBER, user => {
             Login(user);
             NavigateTo<MainViewModel, User, MyPollContext>();

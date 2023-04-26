@@ -9,17 +9,29 @@
               d:DataContext="{d:DesignInstance Type=vm:MainViewModel, IsDesignTimeCreatable=True}"
               mc:Ignorable="d"
               WindowStartupLocation="CenterScreen"
-              Title="My polls"
+              Title="{Binding Title}"
               Height="900" Width="900">
     <!-- faire un binding title pour faire : 'admin's polls' -->
+    
 
     <Window.DataContext>
         <vm:MainViewModel x:Name="vm"/>
     </Window.DataContext>
-    <f:MyTabControl x:Name="tabControl" Margin="10" Grid.Row="1" HasCloseButton="True">
-        <TabItem x:Name="polls" Header="Polls" Tag="Polls">
-            <vw:PollsView/>
-        </TabItem>
-    </f:MyTabControl>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <Menu>
+            <MenuItem Header="Logout" Click="MenuLogout_Click"/>
+            <MenuItem Header="Reload" Command="{Binding ReloadDataCommand}" />
+        </Menu>
+        <f:MyTabControl x:Name="tabControl" Margin="10" Grid.Row="1" HasCloseButton="True">
+            <TabItem x:Name="polls" Header="Polls" Tag="Polls">
+                <vw:PollsView/>
+            </TabItem>
+        </f:MyTabControl>
+    </Grid>
+
 
 </f:WindowBase>

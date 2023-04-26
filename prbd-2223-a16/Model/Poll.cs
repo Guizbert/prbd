@@ -86,7 +86,14 @@ public class Poll : EntityBase<MyPollContext> {
        return allPolls;
     }
 
-   
+
+    public static PollType[] getTypes() {
+        return Enum.GetValues(typeof(PollType)).Cast<PollType>().ToArray();
+
+    }
+    //public static PollType[] getTypes() =>
+    //    Enum.GetValues(typeof(PollType)).Cast<PollType>().ToArray();
+
     public void Delete() {
         // doit delete les choix, vote, ?
         Choices.Clear();
