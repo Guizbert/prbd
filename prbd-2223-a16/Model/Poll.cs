@@ -83,8 +83,7 @@ public class Poll : EntityBase<MyPollContext> {
     [NotMapped]
     public static IEnumerable<User> AllUsers {
         get {
-            var user = Context.Users;
-            return user.ToList();
+            return Context.Users.ToList();
         }
     }
 

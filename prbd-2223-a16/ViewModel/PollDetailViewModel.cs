@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -51,7 +52,8 @@ internal class PollDetailViewModel : ViewModelCommon {
     }
 
 
-    public IEnumerable<User> AllParticipants {
+
+    public static IEnumerable<User> AllParticipants {
         get {
             return Poll.AllUsers;
         }
@@ -68,9 +70,9 @@ internal class PollDetailViewModel : ViewModelCommon {
         }
     }
 
-    private string _selectedUser;
+    private User _selectedUser;
 
-    public string SelectedUser {
+    public User SelectedUser {
         get => _selectedUser;
         set {
             _selectedUser = value;
@@ -78,18 +80,60 @@ internal class PollDetailViewModel : ViewModelCommon {
         }
     }
 
+    private ObservableCollection<User> _participants;
+
+    public ObservableCollection<User> UserParticipants {
+        get => _participants;
+        set => SetProperty(ref _participants, value, () => AddParticipant());
+    }
+    private RelayCommand _addParticipantCommand;
+
+    public ICommand AddParticipantCommand {
+        get {
+            if (_addParticipantCommand == null) {
+                _addParticipantCommand = new RelayCommand(AddParticipant); 
+            }
+            return _addParticipantCommand;
+        }
+    }
+    private void AddParticipant() {
+        if (CanAddParticipant()) {
+            Console.WriteLine("Ajout participant");
+            UserParticipants.Add(SelectedUser); // Ajouter l'utilisateur sélectionné à la liste de participants
+        } else {
+            Console.WriteLine("peut pas l'ajouter");
+
+            
+        }
+        Console.WriteLine("User Participants : ");
+        foreach (User u in UserParticipants) {
+            Console.WriteLine("   ----->  " + u.FullName);
+        }
+        refreshList();
+    }
+
+    private bool CanAddParticipant() {
+        return SelectedUser != null && !UserParticipants.Any(p => p.Id == SelectedUser.Id); // Vérifier si l'utilisateur est sélectionné et n'est pas déjà dans la liste de participants
+    }
 
 
     public PollDetailViewModel(Poll poll, bool isNew)
     {
         Poll = poll;
         IsNew= isNew;
+        if (UserParticipants == null) {
+            UserParticipants = new ObservableCollection<User>();
+        }
         Save = new RelayCommand(SaveAction, CanSaveAction);
         Cancel = new RelayCommand(CancelAction, CanCancelAction);
         Delete = new RelayCommand(DeleteAction, () => !IsNew);
 
         RaisePropertyChanged();
-
+        refreshList();
+    }
+    public void refreshList() {
+        //Poll.Participants = Participants;
+        RaisePropertyChanged(nameof(UserParticipants));
     }
 
     public override void SaveAction()
@@ -100,7 +144,6 @@ internal class PollDetailViewModel : ViewModelCommon {
         }
         Context.SaveChanges();
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
-
     }
 
     private bool CanSaveAction() {
