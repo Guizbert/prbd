@@ -14,7 +14,10 @@ internal class PollDetailViewModel : ViewModelCommon {
 
     public ICommand Save { get; set; }
     public ICommand Cancel { get; set; }
+    public ICommand AddMyselfCommand { get; set; }
+    public ICommand AddAllParticipantsCommand { get; set; }
     public ICommand Delete { get; set; }
+    public ICommand AddChoiceCommand { get; set; } // <------------------------------------------ ????????????????
 
     //private User _user;
     //public User User {
@@ -41,6 +44,12 @@ internal class PollDetailViewModel : ViewModelCommon {
             NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
         });
     }
+    private int _creatorId;
+
+    public int CreatorId {
+        get => CurrentUser.Id;
+        set => SetProperty(ref _creatorId, value);
+    }
 
     public string Creator {
         get => $"(Created by {CurrentUser.FullName})";
@@ -51,7 +60,11 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(ref _isClosed, value);
     }
 
-
+    private bool _isAddingChoice;
+    public bool IsAddingChoice {
+        get => _isAddingChoice;
+        set => SetProperty(ref _isAddingChoice, value);
+    }
 
     public static IEnumerable<User> AllParticipants {
         get {
@@ -96,6 +109,7 @@ internal class PollDetailViewModel : ViewModelCommon {
             return _addParticipantCommand;
         }
     }
+    
     private void AddParticipant() {
         if (CanAddParticipant()) {
             Console.WriteLine("Ajout participant");
@@ -128,6 +142,9 @@ internal class PollDetailViewModel : ViewModelCommon {
         Cancel = new RelayCommand(CancelAction, CanCancelAction);
         Delete = new RelayCommand(DeleteAction, () => !IsNew);
 
+        AddMyselfCommand = new RelayCommand(AddMyself);
+        AddAllParticipantsCommand = new RelayCommand(AddAll);
+
         RaisePropertyChanged();
         refreshList();
     }
@@ -135,10 +152,29 @@ internal class PollDetailViewModel : ViewModelCommon {
         //Poll.Participants = Participants;
         RaisePropertyChanged(nameof(UserParticipants));
     }
+    public void AddMyself() {
+        if (!UserParticipants.Contains(CurrentUser)) {
+            UserParticipants.Add(CurrentUser); // Ajouter l'utilisateur sélectionné à la liste de participants
+        }
+        RaisePropertyChanged(nameof(UserParticipants));
+    }
+    public void AddAll() {
+        foreach(var user in AllParticipants) {
+            if (!UserParticipants.Contains(user)) {
+                UserParticipants.Add(user);
+            }
+        }
+        RaisePropertyChanged(nameof(UserParticipants));
+    }
+ 
 
     public override void SaveAction()
     {
         if (IsNew) {
+            var newPoll = new Poll(
+                Title = Title,
+                CreatorId = CreatorId,
+                IsClosed = IsClosed);
             Context.Add(Poll);
             IsNew = false;
         }
@@ -162,6 +198,7 @@ internal class PollDetailViewModel : ViewModelCommon {
             RaisePropertyChanged();
         }
     }
+
     private bool CanCancelAction() {
         return Poll != null && (IsNew || Poll.IsModified);
     }

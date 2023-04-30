@@ -8,7 +8,7 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:PollsCardViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="600" d:DesignWidth="900">
-    <StackPanel>
+    <StackPanel Background="{Binding PollStateColor}">
         <TextBlock FontSize="14" FontWeight="Bold" Width="150" TextAlignment="Center" Text="{Binding Name}" />
         <TextBlock FontSize="14"  Width="150" TextAlignment="Center" Text="{Binding Creator}" />
         <TextBlock FontSize="14"  Width="150" TextAlignment="Center" Text="{Binding Participants, StringFormat='{}{0} participants'}" />

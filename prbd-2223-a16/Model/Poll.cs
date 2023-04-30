@@ -33,6 +33,8 @@ public class Poll : EntityBase<MyPollContext> {
 
     //public string BestChoice => getBestChoice(this);
 
+    //public static IEnumerable<User> UserNotParticipating => UsersNotParticipating;
+
     public virtual ICollection<User> Participants { get; set; }
     public virtual ICollection<Choice> Choices { get; set; }
 
@@ -46,6 +48,10 @@ public class Poll : EntityBase<MyPollContext> {
     }
     public Poll( int id, string name, int creatorId, bool isClosed) {
         Id = id;
+        Name = name;
+        CreatorId = creatorId;
+        Closed = isClosed;
+    }public Poll( string name, int creatorId, bool isClosed) {
         Name = name;
         CreatorId = creatorId;
         Closed = isClosed;
@@ -72,6 +78,12 @@ public class Poll : EntityBase<MyPollContext> {
             return choices;
         }
     }
+    [NotMapped]
+    public static IEnumerable<User> AllUsers {
+        get {
+          return Context.Users.ToList();
+        }
+    }
 
     //[NotMapped]
     //public static IEnumerable<string> AllUsers {
@@ -80,11 +92,20 @@ public class Poll : EntityBase<MyPollContext> {
     //    }
     //}
 
-    [NotMapped]
-    public static IEnumerable<User> AllUsers {
-        get {
-            return Context.Users.ToList();
-        }
+    //[NotMapped]
+    //public static IEnumerable<User> AllUsers => Context.Users.ToList().Except(ParticipatingUsers());
+
+    //[NotMapped]
+    //public static IEnumerable<User> UsersNotParticipating {
+    //    get {
+    //        return Context.Users.Where(u => !Participants.Contains(u));
+    //    }
+    //}
+
+
+
+    public bool HasVoted(User currentUser) {
+        return Choices.Any(c => c.CheckUserVotedOnce(currentUser));
     }
 
     public int GetTotalVote {

@@ -27,5 +27,10 @@ public class Choice : EntityBase<MyPollContext> {
         PollId = pollId;
         Label = label;
     }
-    
+
+    public bool CheckUserVotedOnce(User currentUser) {
+        return Votes.Any(vote => vote.User.Equals(currentUser));
+    }
+
+
 }

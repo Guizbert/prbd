@@ -24,8 +24,23 @@ public class PollsCardViewModel : ViewModelCommon
     public int Votes => Poll.GetTotalVote;
     public IEnumerable<Choice> BestChoice => Poll.BestChoice;
 
+
     public PollsCardViewModel(Poll poll) {
         Poll = poll;
+    }
+
+    public string PollStateColor {
+        get => GetPollStateColor();
+    }
+
+    public string GetPollStateColor() {
+        if (Poll.Closed) {
+            return "#fc9cb7";
+        }
+        else if(Poll.HasVoted(CurrentUser)) {
+            return "#b3ffb3";
+        }else
+            return "#949494";
     }
 }
 
