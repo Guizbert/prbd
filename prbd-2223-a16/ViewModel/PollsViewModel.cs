@@ -30,12 +30,11 @@ public class PollsViewModel : ViewModelCommon
         getPolls();
         ApplyFilter = new RelayCommand(ApplyFilterAction);
         ClearFilter = new RelayCommand(() => Filter = "");
-        OnRefreshData();
         NewPoll = new RelayCommand(() => {
             NotifyColleagues(App.Messages.MSG_CREATE_POLL, new Poll());
         });
         Register<Poll>(App.Messages.MSG_UPDATE_POLL, poll => ApplyFilterAction());
-
+        OnRefreshData();
     }
 
     private void getPolls() {

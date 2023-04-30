@@ -17,15 +17,17 @@ internal class PollDetailViewModel : ViewModelCommon {
     public ICommand AddMyselfCommand { get; set; }
     public ICommand AddAllParticipantsCommand { get; set; }
     public ICommand Delete { get; set; }
-    public ICommand AddChoiceCommand { get; set; } // <------------------------------------------ ????????????????
-
-    //private User _user;
-    //public User User {
-    //    get { return _user; }
-    //    set => SetProperty(ref _user, value);
-    //}
-
-    // check si c'est un new poll
+    public ICommand AddChoiceCommand {get;set;}
+    private string _choiceLabel { get; set; }
+    public string ChoiceLabel {
+        get => _choiceLabel;
+        set {
+            if (!string.Equals(_choiceLabel, value)) {
+                _choiceLabel = value;
+                RaisePropertyChanged();
+            }
+        }
+    }
 
     private Poll _poll;
     public Poll Poll {
@@ -60,11 +62,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(ref _isClosed, value);
     }
 
-    private bool _isAddingChoice;
-    public bool IsAddingChoice {
-        get => _isAddingChoice;
-        set => SetProperty(ref _isAddingChoice, value);
-    }
+    
 
     public static IEnumerable<User> AllParticipants {
         get {
@@ -93,11 +91,21 @@ internal class PollDetailViewModel : ViewModelCommon {
         }
     }
 
+   
+
     private ObservableCollection<User> _participants;
 
     public ObservableCollection<User> UserParticipants {
         get => _participants;
         set => SetProperty(ref _participants, value, () => AddParticipant());
+    }
+
+
+
+    private ObservableCollection<Choice> _choices;
+    public ObservableCollection<Choice> Choices {
+        get => _choices;
+        set => SetProperty(ref _choices, value, () => AddChoice());
     }
     private RelayCommand _addParticipantCommand;
 
@@ -126,6 +134,22 @@ internal class PollDetailViewModel : ViewModelCommon {
         refreshList();
     }
 
+    private void AddChoice() {
+        if (string.IsNullOrEmpty(ChoiceLabel)) {
+            // Le libellé de choix est vide ou null, ne rien faire
+            return;
+        }
+
+        var newChoice = new Choice { Label = ChoiceLabel };
+        Choices.Add(newChoice);
+
+        // Réinitialiser la valeur de la propriété ChoiceLabel
+        ChoiceLabel = string.Empty;
+
+        refreshList();
+
+    }
+
     private bool CanAddParticipant() {
         return SelectedUser != null && !UserParticipants.Any(p => p.Id == SelectedUser.Id); // Vérifier si l'utilisateur est sélectionné et n'est pas déjà dans la liste de participants
     }
@@ -138,9 +162,14 @@ internal class PollDetailViewModel : ViewModelCommon {
         if (UserParticipants == null) {
             UserParticipants = new ObservableCollection<User>();
         }
+        if (Choices == null) {
+            Choices = new ObservableCollection<Choice>();
+        }
         Save = new RelayCommand(SaveAction, CanSaveAction);
         Cancel = new RelayCommand(CancelAction, CanCancelAction);
         Delete = new RelayCommand(DeleteAction, () => !IsNew);
+
+        AddChoiceCommand = new RelayCommand(AddChoice);
 
         AddMyselfCommand = new RelayCommand(AddMyself);
         AddAllParticipantsCommand = new RelayCommand(AddAll);
@@ -151,6 +180,7 @@ internal class PollDetailViewModel : ViewModelCommon {
     public void refreshList() {
         //Poll.Participants = Participants;
         RaisePropertyChanged(nameof(UserParticipants));
+        RaisePropertyChanged(nameof(Choices));
     }
     public void AddMyself() {
         if (!UserParticipants.Contains(CurrentUser)) {
@@ -170,15 +200,38 @@ internal class PollDetailViewModel : ViewModelCommon {
 
     public override void SaveAction()
     {
+        Console.WriteLine(Poll.Id + " 1 ");
         if (IsNew) {
             var newPoll = new Poll(
                 Title = Title,
                 CreatorId = CreatorId,
+                SelectedPollType = SelectedPollType,
                 IsClosed = IsClosed);
-            Context.Add(Poll);
+            Context.Add(newPoll);
+            Context.SaveChanges();
+            Console.WriteLine(newPoll.Id + "<---------------------------------------- 2 ");
+            Poll = newPoll; // pour récup l'id
+
             IsNew = false;
         }
+
+        Console.WriteLine(Poll.Id + "<------ 3 ");
+        foreach (var user in UserParticipants) {
+            var newParti = new Participation(Poll.Id, user.Id);
+            Context.Participations.Add(newParti);
+        }
         Context.SaveChanges();
+
+
+        foreach (var choice in Choices) {
+            var newChoice = new Choice(Poll.Id, choice.Label) ;
+            Context.Choices.Add(newChoice);
+        }
+        Context.SaveChanges();
+        
+
+       
+
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
     }
 
@@ -202,12 +255,12 @@ internal class PollDetailViewModel : ViewModelCommon {
     private bool CanCancelAction() {
         return Poll != null && (IsNew || Poll.IsModified);
     }
-    private void DeleteAction() {
-        CancelAction();
-        Poll.Delete();
-        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
-        NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
-    }
+    //private void DeleteAction() {
+    //    //CancelAction();
+    //    Poll.Delete();
+    //    NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+    //    NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
+    //}
 
 }
 

@@ -11,14 +11,21 @@ namespace MyPoll.Model;
 public class Participation : EntityBase<MyPollContext> {
 
 
-    [ForeignKey(nameof(Poll))]
+    [Required, ForeignKey(nameof(Poll))]
     public int PollId { get; set; }
-
-    [ForeignKey(nameof(User))]
-    public int UserId { get; set; }
-
     public virtual Poll Poll { get; set; }
+
+    [Required, ForeignKey(nameof(User))]
+    public int UserId { get; set; }
     public virtual User User { get; set; }
+
+
+    public Participation( int  pollid, int userid) {
+        PollId = pollid;
+        UserId = userid;
+    }
+    public Participation( ) {
+    }
 
 
 }

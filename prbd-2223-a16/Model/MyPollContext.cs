@@ -66,9 +66,7 @@ public class MyPollContext : DbContextBase {
                     .HasForeignKey(p => p.UserId),
                p => {
                    p.HasKey(p => new { p.PollId, p.UserId });
-               }
-
-            );
+               });
 
 
         modelBuilder.Entity<User>()
@@ -124,8 +122,11 @@ public class MyPollContext : DbContextBase {
             .OnDelete(DeleteBehavior.NoAction);
 
         // -----------
+        //modelBuilder.Entity<Participation>()
+        //    .HasKey(p => new { p.PollId, p.UserId });
+
         modelBuilder.Entity<Participation>()
-            .HasKey(p => new { p.PollId, p.UserId });
+            .Property(p => p.UserId);
 
         /* modelBuilder.Entity<Participation>()
              .HasOne(p => p.Poll)

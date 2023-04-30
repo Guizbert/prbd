@@ -51,9 +51,10 @@ public class Poll : EntityBase<MyPollContext> {
         Name = name;
         CreatorId = creatorId;
         Closed = isClosed;
-    }public Poll( string name, int creatorId, bool isClosed) {
+    }public Poll( string name, int creatorId, PollType type,  bool isClosed) {
         Name = name;
         CreatorId = creatorId;
+        Type= type;
         Closed = isClosed;
     }
 
@@ -133,7 +134,8 @@ public class Poll : EntityBase<MyPollContext> {
         // doit delete les choix, vote, ?
         Choices.Clear();
         Participants.Clear();
-        commentaires.Clear();
+        if(commentaires.Count > 0)
+            commentaires.Clear();
 
         Context.Polls.Remove(this);
         Context.SaveChanges();
