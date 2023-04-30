@@ -167,7 +167,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         }
         Save = new RelayCommand(SaveAction, CanSaveAction);
         Cancel = new RelayCommand(CancelAction, CanCancelAction);
-        Delete = new RelayCommand(DeleteAction, () => !IsNew);
+        //Delete = new RelayCommand(DeleteAction, () => !IsNew);
 
         AddChoiceCommand = new RelayCommand(AddChoice);
 
@@ -211,6 +211,7 @@ internal class PollDetailViewModel : ViewModelCommon {
             Context.SaveChanges();
             Console.WriteLine(newPoll.Id + "<---------------------------------------- 2 ");
             Poll = newPoll; // pour récup l'id
+            NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
 
             IsNew = false;
         }
@@ -250,6 +251,8 @@ internal class PollDetailViewModel : ViewModelCommon {
             Poll.Reload();
             RaisePropertyChanged();
         }
+        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+
     }
 
     private bool CanCancelAction() {

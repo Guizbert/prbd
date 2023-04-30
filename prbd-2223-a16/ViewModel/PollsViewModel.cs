@@ -23,18 +23,23 @@ public class PollsViewModel : ViewModelCommon
     public ICommand ClearFilter { get; set; }
     public ICommand ApplyFilter { get; set; }
     public ICommand NewPoll{ get; set;}
+    public ICommand DisplayPollsDetails { get; set;}
 
 
 
     public PollsViewModel() : base() {
-        getPolls();
+        getPolls(); OnRefreshData();
+
         ApplyFilter = new RelayCommand(ApplyFilterAction);
         ClearFilter = new RelayCommand(() => Filter = "");
         NewPoll = new RelayCommand(() => {
             NotifyColleagues(App.Messages.MSG_CREATE_POLL, new Poll());
         });
-        Register<Poll>(App.Messages.MSG_UPDATE_POLL, poll => ApplyFilterAction());
-        OnRefreshData();
+        DisplayPollsDetails = new RelayCommand<PollDetailViewModel>(pc => {
+            NotifyColleagues(App.Messages.MSG_DISPLAY_POLL, pc);
+        });
+        //Register<Poll>(App.Messages.MSG_UPDATE_POLL, poll => ApplyFilterAction());
+        Register<Poll>(App.Messages.MSG_UPDATE_POLL, poll => OnRefreshData());
     }
 
     private void getPolls() {
@@ -81,7 +86,6 @@ public class PollsViewModel : ViewModelCommon
     }
 
     protected override void OnRefreshData() {
-        Polls.Clear();
         getPolls();
     }
 }

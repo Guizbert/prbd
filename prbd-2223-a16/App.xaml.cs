@@ -50,12 +50,17 @@ public partial class App : ApplicationBase<User, MyPollContext > {
 
     private static void PrepareDatabase() {
         // Clear database and seed data
-        //Context.Database.EnsureDeleted();
+        Context.Database.EnsureDeleted();
         Context.Database.EnsureCreated();
 
         // Cold start
         Console.Write("Cold starting database... ");
         Context.Users.Find(0);
         Console.WriteLine("done");
+    }
+
+    protected override void OnRefreshData() {
+        if (CurrentUser?.Email != null)
+            CurrentUser = User.GetByEmail(CurrentUser.Email);
     }
 }

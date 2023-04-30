@@ -45,4 +45,9 @@ public class User : EntityBase<MyPollContext> {
      *      -> créer sondage ;
      */
 
+
+    public static User GetByEmail(string mail) {
+        return Context.Users.SingleOrDefault(u => u.Email== mail);
+    }
+
 }
