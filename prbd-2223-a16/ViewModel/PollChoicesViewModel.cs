@@ -71,7 +71,7 @@ internal class PollChoicesViewModel : ViewModelCommon{
     }
 
 
-    public PollChoicesViewModel(Poll poll) { 
+    public PollChoicesViewModel(Poll poll) {
         Poll = poll;
         Edit = new RelayCommand(EditAction, CanDoAction);
         Delete = new RelayCommand(DeleteAction, CanDoAction);

@@ -58,11 +58,9 @@ internal class PollDetailViewModel : ViewModelCommon {
     }
     private bool _isClosed;
     public bool IsClosed {
-        get => _isNew;
+        get => _isClosed;
         set => SetProperty(ref _isClosed, value);
     }
-
-    
 
     public static IEnumerable<User> AllParticipants {
         get {
