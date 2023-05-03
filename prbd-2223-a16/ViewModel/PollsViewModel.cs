@@ -35,14 +35,15 @@ public class PollsViewModel : ViewModelCommon
         NewPoll = new RelayCommand(() => {
             NotifyColleagues(App.Messages.MSG_CREATE_POLL, new Poll());
         });
-        DisplayPollsDetails = new RelayCommand<PollDetailViewModel>(pc => {
-            NotifyColleagues(App.Messages.MSG_DISPLAY_POLL, pc);
+        DisplayPollsDetails = new RelayCommand<PollsCardViewModel>(pc => {
+            NotifyColleagues(App.Messages.MSG_CHOICE_POLL, pc.Poll);
         });
         //Register<Poll>(App.Messages.MSG_UPDATE_POLL, poll => ApplyFilterAction());
         Register<Poll>(App.Messages.MSG_UPDATE_POLL, poll => OnRefreshData());
     }
 
     private void getPolls() {
+
         IQueryable<Poll> polls = Poll.GetPolls(CurrentUser);
 
         Polls = new ObservableCollection<PollsCardViewModel>(

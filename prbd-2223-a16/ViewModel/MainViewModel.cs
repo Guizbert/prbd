@@ -22,7 +22,7 @@ public class MainViewModel : ViewModelCommon {
 
     //public string Title { get; } = "prbd-2223-a16";
     public static string Title {
-        get => $"{CurrentUser.FullName}'s polls";
+        get => $"My polls ({CurrentUser.FullName})";
         //get => $"My Social Network ({CurrentUser?.Pseudo})";
     }
 }

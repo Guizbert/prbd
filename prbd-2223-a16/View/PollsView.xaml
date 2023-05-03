@@ -7,9 +7,9 @@
              xmlns:vw="clr-namespace:MyPoll.View"
              xmlns:vm="clr-namespace:MyPoll.ViewModel"
              xmlns:f="clr-namespace:PRBD_Framework;assembly=PRBD_Framework"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=vm:PollsViewModel}"
              d:DesignHeight="450" d:DesignWidth="750">
-
     <UserControl.DataContext>
         <vm:PollsViewModel x:Name="vm"/>
     </UserControl.DataContext>

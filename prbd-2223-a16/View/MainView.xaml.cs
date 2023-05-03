@@ -7,12 +7,19 @@ namespace MyPoll.View;
 public partial class MainView : WindowBase {
     public MainView() {
         InitializeComponent();
+        Console.WriteLine(polls);
 
         Register<Poll>(App.Messages.MSG_CREATE_POLL,
             poll => DoDisplayPoll(poll, true));
 
-        Register<Poll>(App.Messages.MSG_DISPLAY_POLL,
-            poll => DoDisplayPoll(poll, false));
+       Register<Poll>(App.Messages.MSG_EDIT_POLL,                 // si le user veut edit un poll
+            poll => DoDisplayPoll(poll, true));
+        
+        Register<Poll>(App.Messages.MSG_CREATED_POLL,             // CLOSE TAB après creation poll
+            poll => DoCloseTab(poll));
+      
+        Register<Poll>(App.Messages.MSG_CHOICE_POLL,              // si on veut faire des votes, etc
+            poll => DoDisplayPollElements(poll));
 
 
     }
@@ -21,6 +28,11 @@ public partial class MainView : WindowBase {
     private void DoDisplayPoll(Poll poll, bool isNew) {
         if(poll != null) {
             OpenTab(isNew ? "<New Poll>" : poll.Name, poll.Name,() => new PollDetailView(poll, isNew));
+        }
+    }
+    private void DoDisplayPollElements(Poll poll) {
+        if(poll != null) {
+            OpenTab(poll.Name, poll.Name, () => new PollChoicesView(poll));
         }
     }
 

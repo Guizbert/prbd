@@ -164,7 +164,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         }
         if (Choices == null) {
             Choices = new ObservableCollection<Choice>();
-        }
+        }   
         Save = new RelayCommand(SaveAction, CanSaveAction);
         Cancel = new RelayCommand(CancelAction, CanCancelAction);
         //Delete = new RelayCommand(DeleteAction, () => !IsNew);
@@ -234,13 +234,22 @@ internal class PollDetailViewModel : ViewModelCommon {
        
 
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+        NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
     }
 
     private bool CanSaveAction() {
-        if (IsNew) 
-            return !string.IsNullOrEmpty(Title);
-        return Poll != null && Poll.IsModified;
+        if (IsNew) {
+            return
+                !string.IsNullOrEmpty(Title) &&
+                UserParticipants.Count >0 && Choices.Count > 0;
+        }
 
+        return Poll != null &&
+            Poll.IsModified &&
+            Poll.Participants != null &&
+            Poll.Participants.Any() &&
+            Poll.Choices != null &&
+            Poll.Choices.Any();
     }
 
     public override void CancelAction() {

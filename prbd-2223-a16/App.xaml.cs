@@ -8,17 +8,20 @@ namespace MyPoll;
 public partial class App : ApplicationBase<User, MyPollContext > {
     // TODO : afficher les best choices
     public enum Messages {
-        MSG_NEW_MEMBER,
-        MSG_CREATE_POLL,
-        MSG_DISPLAY_POLL,
-        MSG_DELETE_POLL,
-        MSG_UPDATE_POLL,
+        MSG_NEW_MEMBER,             // nouveau membre
+        MSG_CREATE_POLL,            // nouveau poll
+        MSG_CREATED_POLL,           // création poll
+        MSG_DISPLAY_POLL,           // afficher les polls
+        MSG_CHOICE_POLL,           // afficher les polls
+        MSG_DELETE_POLL,            // supprimer poll
+        MSG_UPDATE_POLL,            // mettre à jour poll
+        MSG_EDIT_POLL,              // pour aller sur la page edit de poll
 
-        MSG_CREATE_COMMENT,
-        MSG_DELETE_COMMENT,
-        MSG_UPDATE_COMMENT,
+        MSG_CREATE_COMMENT,         // création commentaire
+        MSG_DELETE_COMMENT,         // supprimer commentaire
+        MSG_UPDATE_COMMENT,         // edit commentaire
 
-        MSG_CREATE_VOTE,
+        MSG_CREATE_VOTE,            //etc 
         MSG_DELETE_VOTE,
         MSG_UPDATE_VOTE,
 
