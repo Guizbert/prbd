@@ -29,6 +29,11 @@ public class Vote : EntityBase<MyPollContext>
         ChoiceId = choiceId;
         UserId = userId;
     }
+    public Vote(Choice choice, User user)
+    {
+        ChoiceId = choice.Id;
+        UserId = user.Id;
+    }
 
     public Vote() { }
 

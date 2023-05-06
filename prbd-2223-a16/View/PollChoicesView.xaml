@@ -6,6 +6,7 @@
                    xmlns:f="clr-namespace:PRBD_Framework;assembly=PRBD_Framework"
                    xmlns:vm="clr-namespace:MyPoll.ViewModel"
                    xmlns:mypoll="clr-namespace:MyPoll"
+                   xmlns:vw="clr-namespace:MyPoll.View"
                    d:DataContext="{d:DesignInstance Type=mypoll:PollChoicesViewModel}"
                    mc:Ignorable="d"
                    d:DesignHeight="450" d:DesignWidth="750"
@@ -25,7 +26,7 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="Bold" Grid.Column="0"
-                       TextTrimming="CharacterEllipsis" />
+                   TextTrimming="CharacterEllipsis" />
             <Label x:Name="creator" Content="created by " Margin="5,0,0,0" Grid.Column="1" />
             <TextBlock Text="{Binding Creator}" Margin="5" Grid.Column="2" />
         </Grid>
@@ -35,5 +36,9 @@
                 <Button Content="Reopen" Height="23" />
             </StackPanel>
         </Grid>
+
+        <vw:VoteGridView DataContext="{Binding VoteGridViewModel}" Grid.Row="1" Margin="36,79,36,133" />
+
     </Grid>
+
 </f:UserControlBase>

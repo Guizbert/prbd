@@ -44,9 +44,6 @@ public class LoginViewModel : ViewModelCommon {
         }
     }
     private void OpenSignUp() {
-        var signupView = new SignUpView();
-        // TODO : 
-        // envoyer un App.Message et navigateTo signupView
         NotifyColleagues(App.Messages.MSG_NEW_MEMBER, new User());
     }
 

@@ -13,6 +13,9 @@ internal class PollChoicesViewModel : ViewModelCommon{
         set => SetProperty(ref _poll, value);
 
     }
+    private VoteGridViewModel _voteGridViewModel;
+
+    public VoteGridViewModel VoteGridViewModel => _voteGridViewModel;
 
     // afficher en haut de la page:
     public string Title { get => Poll.Name; }
@@ -72,7 +75,8 @@ internal class PollChoicesViewModel : ViewModelCommon{
 
 
     public PollChoicesViewModel(Poll poll) {
-        Poll = poll;
+        _voteGridViewModel = new VoteGridViewModel(poll);
+        _poll = poll;
         Edit = new RelayCommand(EditAction, CanDoAction);
         Delete = new RelayCommand(DeleteAction, CanDoAction);
         AddCommentCommand = new RelayCommand(AddCommentAction);

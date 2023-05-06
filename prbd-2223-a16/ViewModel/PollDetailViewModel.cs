@@ -227,9 +227,6 @@ internal class PollDetailViewModel : ViewModelCommon {
             Context.Choices.Add(newChoice);
         }
         Context.SaveChanges();
-        
-
-       
 
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
         NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
