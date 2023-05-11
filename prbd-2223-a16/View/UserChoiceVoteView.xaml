@@ -7,37 +7,56 @@
              mc:Ignorable="d"
              xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
              xmlns:vm="clr-namespace:MyPoll.ViewModel"
+             xmlns:m="clr-namespace:MyPoll.Model"
+             xmlns:media="clr-namespace:System.Windows.Media;assembly=PresentationCore"
              xmlns:f="clr-namespace:PRBD_Framework;assembly=PRBD_Framework"
-             d:DesignHeight="450" d:DesignWidth="800"
+             d:DesignHeight="250" d:DesignWidth="200"
              d:DataContext="{d:DesignInstance Type=vm:UserChoiceVoteViewModel, IsDesignTimeCreatable=True}"
              x:Name="uc">
 
-    <Border BorderBrush="Black" BorderThickness="1,0,0,1" SnapsToDevicePixels="True" Width="100" MinHeight="50">
+    <Border  BorderBrush="Black" BorderThickness="1,0,0,1" SnapsToDevicePixels="True" Width="100" MinHeight="50">
         <StackPanel VerticalAlignment="Center">
-            <!-- Affiche l'icône de choix en fonction du vote de l'utilisateur -->
-            <fa:FontAwesome Icon="{Binding CheckedIcon}" Foreground="{Binding CheckedIconColor}" FontSize="25"
-            Visibility="{c:Binding !EditMode}" />
+
+            <!-- Affiche les boutons de choix lors de l'édition -->
+            <fa:FontAwesome Icon="{Binding GetCurrentIcon}"
+                            Foreground="{Binding GetCurrentChoiceColor}"
+                            FontSize="25"
+                            Visibility="{c:Binding !EditMode}" />
+
             <!-- Affiche les boutons de choix lors de l'édition -->
             <StackPanel Orientation="Horizontal" Visibility="{c:Binding EditMode}">
+
                 <!-- Bouton de vote "Oui" -->
                 <Button Padding="2" BorderBrush="Transparent" Background="Transparent" Width="32"
-                     Command="{Binding VoteYes}">
-                    <fa:FontAwesome Icon="{Binding CheckedIcon}" Foreground="{Binding CheckedIconColor}" FontSize="25"
-                    ToolTip="{Binding YesToolTip}" />
+                    Command="{Binding ChangeVote}" CommandParameter="{x:Static m:VoteType.Yes}" Height="31">
+                    <fa:FontAwesome Icon="Solid_Check"
+                                Foreground="{c:Binding HasVotedYes ? media:Brushes.Green : media:Brushes.LightGray}"
+                                ToolTip="Yes"
+                                FontSize="25" Width="32"/>
                 </Button>
                 <!-- Bouton de vote "Peut-être" -->
-                <Button Padding="2" BorderBrush="Transparent" Background="Transparent" Width="32"
-                     Command="{Binding VoteMaybe}">
-                    <fa:FontAwesome Icon="{Binding MaybeIcon}" Foreground="{Binding MaybeIconColor}" FontSize="25"
-                    ToolTip="{Binding MaybeToolTip}" />
+                <Button Padding="2" BorderBrush="Transparent" Background="Transparent" Width="32" 
+                    Command="{Binding ChangeVote}" CommandParameter="{x:Static m:VoteType.Maybe}" Height="34">
+                    <fa:FontAwesome Icon="Solid_CircleQuestion" 
+                                Foreground="{c:Binding HasVotedMaybe ? media:Brushes.Yellow : media:Brushes.LightGray}"
+                                ToolTip="Maybe"
+                                FontSize="25"/>
                 </Button>
+
                 <!-- Bouton de vote "Non" -->
-                <Button Padding="2" BorderBrush="Transparent" Background="Transparent" Width="32"
-                     Command="{Binding VoteNo}">
-                    <fa:FontAwesome Icon="{Binding NoIcon}" Foreground="{Binding NoIconColor}" FontSize="25"
-                    ToolTip="{Binding NoToolTip}" />
+                <Button Padding="2" BorderBrush="Transparent" Background="Transparent" Width="32" Margin="-90,60,1,1"
+                    Command="{Binding ChangeVote}" CommandParameter="{x:Static m:VoteType.No}">
+                    <fa:FontAwesome Icon="Solid_Xmark"
+                                Foreground="{c:Binding HasVotedNo ? media:Brushes.Red : media:Brushes.LightGray}"
+                                ToolTip="No"
+                                FontSize="25" />
+                </Button>
+
+                <Button  BorderBrush="Transparent" Background="Transparent" Width="32" Margin="-30,60,1,1">
+                    <TextBlock Text="" />
                 </Button>
             </StackPanel>
         </StackPanel>
     </Border>
+
 </UserControl>

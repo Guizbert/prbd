@@ -12,8 +12,8 @@ public partial class MainView : WindowBase {
         Register<Poll>(App.Messages.MSG_CREATE_POLL,
             poll => DoDisplayPoll(poll, true));
 
-       Register<Poll>(App.Messages.MSG_EDIT_POLL,                 // si le user veut edit un poll
-            poll => DoDisplayPoll(poll, true));
+       Register<Poll>(App.Messages.MSG_CREATE_POLL,                 // si le user veut edit un poll
+            poll => DoDisplayPoll(poll, false));
         
         Register<Poll>(App.Messages.MSG_CREATED_POLL,             // CLOSE TAB après creation poll
             poll => DoCloseTab(poll));
@@ -22,13 +22,15 @@ public partial class MainView : WindowBase {
             poll => DoDisplayPollElements(poll));
 
 
+        Register<Poll>(App.Messages.MSG_CLOSE_TAB,              // si on veut faire des votes, etc
+            poll => DoCloseTab(poll));
+
+
     }
 
 
     private void DoDisplayPoll(Poll poll, bool isNew) {
-        if(poll != null) {
             OpenTab(isNew ? "<New Poll>" : poll.Name, poll.Name,() => new PollDetailView(poll, isNew));
-        }
     }
     private void DoDisplayPollElements(Poll poll) {
         if(poll != null) {

@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System.Runtime.CompilerServices;
+using System.Windows.Input;
 using System.Windows.Media;
 using FontAwesome6;
 using MyPoll.Model;
@@ -9,19 +10,37 @@ namespace MyPoll.ViewModel;
                                                 //====================== c'est la vue avec tous les choix possible ======================
 public class UserChoiceVoteViewModel : ViewModelCommon
 {
+
     public UserChoiceVoteViewModel(User user, Choice choice) {
-        UserVote = user.Votes.Any(v => v.Choice.Id == choice.Id);
-
+        UserVoted = user.Votes.Any(v => v.Choice.Id == choice.Id);
+        _user = user;
         /* on doit récup a la creation de la vue les choix des users (si existant)*/
-        Vote = user.Votes.FirstOrDefault(v =>v.Choice.Id == choice.Id, new Vote() {Choice = choice, User = user });
+        Vote = user.Votes.FirstOrDefault(v =>v.Choice.Id == choice.Id)??new Vote() {Choice = choice, User = user, Type = VoteType.Empty };
+        Console.WriteLine(Vote.Type + " LE VOTTEEEEEEEEEEEEEEEEEEEEEE");
+        // faire un boolean pour savoir si le user a voté?
+        ChangeVote = new RelayCommand<VoteType>(voteType => {
+            if(CurrentUser.Id == user.Id) {
+                Vote.Type = voteType;
+                RaisePropertyChanged(nameof(GetCurrentIcon));
+                RaisePropertyChanged(nameof(GetCurrentChoiceColor));
+                Console.WriteLine(GetCurrentIcon + "  <------------- CURRENT x2 ");
+                Console.WriteLine(GetCurrentChoiceColor + "  <------------- CURRENTCOLOR x2 ");
+            }
+        });
+        Console.WriteLine(ChangeVote);
+        Console.WriteLine(GetCurrentIcon + "  <------------- CURRENTCOLOR ");
 
-        // faire un boolean pour savoir si le user a voté? 
-        ChangeVote = new RelayCommand(() => HasVotedYes = !HasVotedYes);
+        HasVoted = user.Votes.Any(v => v.Choice.Id == choice.Id);
     }
 
     public Vote Vote { get; private set; }
     public UserChoiceVoteViewModel() { }
 
+
+    private User _user;
+    public User User {
+        get => _user;
+    }
     private bool _editMode;
     public bool EditMode {
         get => _editMode;
@@ -30,6 +49,11 @@ public class UserChoiceVoteViewModel : ViewModelCommon
 
     public ICommand ChangeVote { get; set; }
 
+    public bool HasVoted {
+        get;
+        set;
+    }
+
     private bool _hasVotedYes;
     public bool HasVotedYes {
         get => _hasVotedYes;
@@ -37,7 +61,7 @@ public class UserChoiceVoteViewModel : ViewModelCommon
     }
 
     public EFontAwesomeIcon CheckedIcon => HasVotedYes ? EFontAwesomeIcon.Solid_Check : EFontAwesomeIcon.None;
-    public Brush CheckedIconColor => HasVotedYes ? Brushes.Green : Brushes.White;
+    public string YesToolTip => HasVotedYes ? "Yes" : "No";
 
     private bool _hasVotedNo;
     public bool HasVotedNo {
@@ -46,21 +70,37 @@ public class UserChoiceVoteViewModel : ViewModelCommon
     }
 
     public EFontAwesomeIcon NoIcon => _hasVotedNo ? EFontAwesomeIcon.Solid_Xmark : EFontAwesomeIcon.None;
-    public Brush NoIconColor => HasVotedNo ? Brushes.Red : Brushes.White;
-
+    public string NoToolTip => HasVotedNo ? "Yes" : "No";
 
     private bool _hasVotedMaybe;
     public bool HasVotedMaybe {
         get => _hasVotedMaybe;
         set => SetProperty(ref _hasVotedMaybe, value);
     }
+    public EFontAwesomeIcon MaybeIcon => HasVotedMaybe ? EFontAwesomeIcon.Solid_CircleQuestion : EFontAwesomeIcon.None;
 
-    public EFontAwesomeIcon MaybedIcon => HasVotedMaybe ? EFontAwesomeIcon.Solid_CircleQuestion : EFontAwesomeIcon.None;
-    public Brush MaybedIconColor => HasVotedNo ? Brushes.Yellow : Brushes.White;
+    public string MaybeToolTip => HasVotedMaybe ? "Yes" : "No";
 
     private bool _userVote;
-    public bool UserVote {
+    public bool UserVoted {
         get => _userVote;
         set => SetProperty(ref _userVote, value);
     }
+    public EFontAwesomeIcon GetCurrentIcon => Vote.Type switch {
+        VoteType.Yes => EFontAwesomeIcon.Solid_Check,
+        VoteType.No => EFontAwesomeIcon.Solid_Xmark,
+        VoteType.Maybe => EFontAwesomeIcon.Solid_CircleQuestion,
+        _ => EFontAwesomeIcon.None,
+    };
+
+    public Brush GetCurrentChoiceColor => Vote.Type switch {
+        VoteType.Yes => Brushes.Green,
+        VoteType.No => Brushes.Red,
+        VoteType.Maybe => Brushes.OrangeRed,
+        _ => Brushes.White,
+    };
+   
+  
+
+    
 }

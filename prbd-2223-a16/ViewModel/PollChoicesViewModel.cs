@@ -1,7 +1,7 @@
 ﻿using System.Windows.Input;
 using MyPoll.Model;
 using MyPoll.ViewModel;
-
+using Newtonsoft.Json.Bson;
 using PRBD_Framework;
 
 namespace MyPoll;
@@ -17,6 +17,9 @@ internal class PollChoicesViewModel : ViewModelCommon{
 
     public VoteGridViewModel VoteGridViewModel => _voteGridViewModel;
 
+    public bool IsCreator => CurrentUser == Poll.Creator;
+    public bool CanReoPen => CurrentUser == Poll.Creator && Poll.Closed;
+
     // afficher en haut de la page:
     public string Title { get => Poll.Name; }
     public string Creator => Poll.Creator.FullName;
@@ -28,8 +31,9 @@ internal class PollChoicesViewModel : ViewModelCommon{
     private bool _addComment;
     public bool AddComment {
         get => _addComment;
-        set => SetProperty(ref _addComment, value, () => AddCommentAction());
+        set => SetProperty(ref _addComment, value, () => ShowTextBox());
     }
+    public bool CanAddComment => AddComment == true;
     //Liste des commentaires :
     // si current User = personne qui a fait un commentaire alors afficher poubelle
 
@@ -40,21 +44,31 @@ internal class PollChoicesViewModel : ViewModelCommon{
     public ICommand Edit { get; set; }
     public ICommand Delete { get; set; }
     public ICommand AddCommentCommand { get; set; }
+    public ICommand ShowTextBoxCommand { get; set; }
 
 
-    public void AddCommentAction() {
-        if(!_addComment)
-            _addComment = true;
-    //   showTextBox();
+    private string _textToAdd;
+
+    public string TextToAdd {
+        get => _textToAdd;
+        set => SetProperty(ref _textToAdd, value, () => AddCommentAction());
     }
-
-
+    public void ShowTextBox() {
+        AddComment = !AddComment;
+    }
+    public void AddCommentAction() {
+        if(TextToAdd != null) {
+            var comment = new Comment(CurrentUser, Poll, TextToAdd, DateTime.Now);
+            Poll.commentaires.Add(comment);
+            Context.Add(comment);
+            Context.SaveChanges();
+            AddComment= false;
+        }
+    }
     // editAction et CanDoAction
 
     public void EditAction() {
-        if (CanDoAction()) {
-            NotifyColleagues(App.Messages.MSG_EDIT_POLL, Poll);
-        }
+        NotifyColleagues(App.Messages.MSG_CREATE_POLL, Poll);
     }
 
 
@@ -80,8 +94,11 @@ internal class PollChoicesViewModel : ViewModelCommon{
         Edit = new RelayCommand(EditAction, CanDoAction);
         Delete = new RelayCommand(DeleteAction, CanDoAction);
         AddCommentCommand = new RelayCommand(AddCommentAction);
-
+        ShowTextBoxCommand = new RelayCommand(ShowTextBox);
+        Console.WriteLine(IsCreator + " Is Creator ? <--------");
+        Console.WriteLine(AddComment + " I AddComment ? <--------");
     }
+
 
 }
 

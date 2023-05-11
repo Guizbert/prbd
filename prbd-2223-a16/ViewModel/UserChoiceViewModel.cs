@@ -37,6 +37,8 @@ public class UserChoiceViewModel : ViewModelCommon
 
     private bool _editMode;
 
+    public bool IsActionVisible => CurrentUser == User || CurrentUser.Role == Role.Administrator;
+
     // La visbilité des boutons de sauvegarde et d'annulation sont bindés sur cette propriété
     public bool EditMode {
         get => _editMode;
@@ -45,8 +47,8 @@ public class UserChoiceViewModel : ViewModelCommon
 
     private void EditModeChanged() {
         // Lorsqu'on change le mode d'édition de la ligne, on le signale à chaque cellule
-        foreach (UserChoiceVoteViewModel regVM in _voteVM) {
-            regVM.EditMode = EditMode;
+        foreach (UserChoiceVoteViewModel voteVM in _voteVM) {
+            voteVM.EditMode = EditMode;
         }
 
         // On informe le parent qu'on change le mode d'édition de la ligne
@@ -74,23 +76,18 @@ public class UserChoiceViewModel : ViewModelCommon
     }
 
     private void RefreshVote() {
-        // On crée, pour chaque inscription de l'étudiant, un RegistrationStudentCourseViewModel
-        // qui sera utilisé par le RegistrationStudentCourseView
-        // RegistrationsVM est la liste qui servira de source pour la balise <ItemsControl>
+        // VoteVM est la liste qui servira de source pour la balise <ItemsControl>
         VoteVM = _choices
             .Select(c => new UserChoiceVoteViewModel(User, c))        // mettre la vue avec les choix
             .ToList();
     }
-
     private void Save() {
         EditMode = false;
-        
-        User.Votes = VoteVM.Where(u => u.HasVotedYes).Select(u => u.Vote).ToList();     // doit le faire sur les differents votes
+        User.Votes = VoteVM.Select(u => u.Vote).ToList();     // doit le faire sur les differents votes // <- pas bon ça récup tous les votes
         Context.SaveChanges();
         // On recrée la liste avec les nouvelles données
         RefreshVote();
     }
-
 
     private void Cancel() {
         EditMode = false;
@@ -99,7 +96,9 @@ public class UserChoiceViewModel : ViewModelCommon
     }
 
     private void Delete() {
-        User.Votes.Clear();
+        //User.Votes.Clear(); // <- pas bon ça récup tous les votes
+
+        VoteVM.Clear(); 
         Context.SaveChanges();
         // On recrée la liste avec les nouvelles données
         RefreshVote();

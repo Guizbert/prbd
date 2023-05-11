@@ -211,6 +211,7 @@ internal class PollDetailViewModel : ViewModelCommon {
             Poll = newPoll; // pour récup l'id
             NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
 
+
             IsNew = false;
         }
 
@@ -229,6 +230,8 @@ internal class PollDetailViewModel : ViewModelCommon {
         Context.SaveChanges();
 
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+
+
         NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
     }
 

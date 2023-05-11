@@ -9,7 +9,7 @@ using PRBD_Framework;
 namespace MyPoll.Model;
 
 public enum VoteType {
-    Yes, No, Maybe,
+    Yes, No, Maybe, Empty
 }
 
 
@@ -34,6 +34,12 @@ public class Vote : EntityBase<MyPollContext>
         ChoiceId = choice.Id;
         UserId = user.Id;
     }
+    public Vote(Choice choice, User user, VoteType voteType)
+    {
+        ChoiceId = choice.Id;
+        UserId = user.Id;
+        Type = voteType;
+    }
 
     public Vote() { }
 
@@ -41,6 +47,7 @@ public class Vote : EntityBase<MyPollContext>
         VoteType.Yes => 1,
         VoteType.Maybe => 0.5,
         VoteType.No => -1,
-        _ => 0,// throw new Exception("bad vote value"),
+        VoteType.Empty => 0,
+        _ => 0 // throw new Exception("bad vote value"),
     };
 }

@@ -29,6 +29,11 @@ public class Comment : EntityBase<MyPollContext> {
         PollId= pollId;
         Text = text;
         Timestamp = timestamp;
+    }public Comment( User user, Poll poll, string text, DateTime timestamp) {
+        UserId= user.Id;
+        PollId= poll.Id;
+        Text = text;
+        Timestamp = timestamp;
     }
 
     public Comment() { }

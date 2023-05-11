@@ -132,10 +132,15 @@ public class Poll : EntityBase<MyPollContext> {
 
     public void Delete() {
         // doit delete les choix, vote, ?
+        foreach(Choice c in Choices) {
+            c.Votes.Clear();
+        }
         Choices.Clear();
         Participants.Clear();
-        if(commentaires.Count > 0)
+        if(commentaires.Count > 0) {
             commentaires.Clear();
+            
+        }
 
         Context.Polls.Remove(this);
         Context.SaveChanges();
