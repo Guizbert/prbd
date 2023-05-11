@@ -54,7 +54,10 @@ internal class PollChoicesViewModel : ViewModelCommon{
         set => SetProperty(ref _textToAdd, value, () => AddCommentAction());
     }
     public void ShowTextBox() {
-        AddComment = !AddComment;
+        if (!AddComment)
+            AddComment = !AddComment;
+        Console.WriteLine(AddComment + " Can write ? <--------");
+
     }
     public void AddCommentAction() {
         if(TextToAdd != null) {
@@ -95,6 +98,7 @@ internal class PollChoicesViewModel : ViewModelCommon{
         Delete = new RelayCommand(DeleteAction, CanDoAction);
         AddCommentCommand = new RelayCommand(AddCommentAction);
         ShowTextBoxCommand = new RelayCommand(ShowTextBox);
+
         Console.WriteLine(IsCreator + " Is Creator ? <--------");
         Console.WriteLine(AddComment + " I AddComment ? <--------");
     }

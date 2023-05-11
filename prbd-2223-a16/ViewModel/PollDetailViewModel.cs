@@ -207,7 +207,6 @@ internal class PollDetailViewModel : ViewModelCommon {
                 IsClosed = IsClosed);
             Context.Add(newPoll);
             Context.SaveChanges();
-            Console.WriteLine(newPoll.Id + "<---------------------------------------- 2 ");
             Poll = newPoll; // pour récup l'id
             NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
 
@@ -215,7 +214,6 @@ internal class PollDetailViewModel : ViewModelCommon {
             IsNew = false;
         }
 
-        Console.WriteLine(Poll.Id + "<------ 3 ");
         foreach (var user in UserParticipants) {
             var newParti = new Participation(Poll.Id, user.Id);
             Context.Participations.Add(newParti);
@@ -230,8 +228,6 @@ internal class PollDetailViewModel : ViewModelCommon {
         Context.SaveChanges();
 
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
-
-
         NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
     }
 
@@ -241,7 +237,6 @@ internal class PollDetailViewModel : ViewModelCommon {
                 !string.IsNullOrEmpty(Title) &&
                 UserParticipants.Count >0 && Choices.Count > 0;
         }
-
         return Poll != null &&
             Poll.IsModified &&
             Poll.Participants != null &&
@@ -265,12 +260,5 @@ internal class PollDetailViewModel : ViewModelCommon {
     private bool CanCancelAction() {
         return Poll != null && (IsNew || Poll.IsModified);
     }
-    //private void DeleteAction() {
-    //    //CancelAction();
-    //    Poll.Delete();
-    //    NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
-    //    NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
-    //}
-
 }
 
