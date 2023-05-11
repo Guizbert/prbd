@@ -137,15 +137,18 @@ internal class PollDetailViewModel : ViewModelCommon {
             // Le libellé de choix est vide ou null, ne rien faire
             return;
         }
+        if (Choices.Any(c => c.Label == ChoiceLabel)) {
+            return;
+        }else {
+            var newChoice = new Choice { Label = ChoiceLabel };
+         
+            Choices.Add(newChoice);
 
-        var newChoice = new Choice { Label = ChoiceLabel };
-        Choices.Add(newChoice);
+            // Réinitialiser la valeur de la propriété ChoiceLabel
+            ChoiceLabel = string.Empty;
 
-        // Réinitialiser la valeur de la propriété ChoiceLabel
-        ChoiceLabel = string.Empty;
-
-        refreshList();
-
+            refreshList();
+        }
     }
 
     private bool CanAddParticipant() {
