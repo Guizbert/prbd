@@ -52,7 +52,8 @@
                                 FontSize="25" />
                 </Button>
 
-                <Button  BorderBrush="Transparent" Background="Transparent" Width="32" Margin="-30,60,1,1">
+                <Button  BorderBrush="Transparent" Background="Transparent" Width="32" Margin="-30,60,1,1"
+                         Command="{Binding ChangeVote}" CommandParameter="{x:Static m:VoteType.Empty}">
                     <TextBlock Text="" />
                 </Button>
             </StackPanel>

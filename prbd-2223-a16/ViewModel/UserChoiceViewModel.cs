@@ -83,7 +83,7 @@ public class UserChoiceViewModel : ViewModelCommon
     }
     private void Save() {
         EditMode = false;
-        User.Votes = VoteVM.Select(u => u.Vote).ToList();     // doit le faire sur les differents votes // <- pas bon ça récup tous les votes
+        User.Votes = VoteVM.Where(u => u.Vote.Type != VoteType.Empty).Select(u => u.Vote).ToList();     // doit le faire sur les differents votes // <- pas bon ça récup tous les votes
         Context.SaveChanges();
         // On recrée la liste avec les nouvelles données
         RefreshVote();

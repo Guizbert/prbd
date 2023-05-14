@@ -17,6 +17,16 @@ internal class PollChoicesViewModel : ViewModelCommon{
 
     public VoteGridViewModel VoteGridViewModel => _voteGridViewModel;
 
+
+    public PollDetailViewModel PollDetailViewModel {
+        get;
+        set;
+    }
+    private bool _canEditPoll;
+    public bool CanEditPoll {
+        get => _canEditPoll;
+        set=> SetProperty(ref _canEditPoll, value);
+    }
     public bool IsCreator => CurrentUser == Poll.Creator;
     public bool CanReoPen => CurrentUser == Poll.Creator && Poll.Closed;
 
@@ -71,6 +81,9 @@ internal class PollChoicesViewModel : ViewModelCommon{
     // editAction et CanDoAction
 
     public void EditAction() {
+        CanEditPoll = true;
+        Console.WriteLine(CanEditPoll);
+        PollDetailViewModel = new PollDetailViewModel(Poll, false);
         NotifyColleagues(App.Messages.MSG_CREATE_POLL, Poll);
     }
 
@@ -94,6 +107,8 @@ internal class PollChoicesViewModel : ViewModelCommon{
     public PollChoicesViewModel(Poll poll) {
         _voteGridViewModel = new VoteGridViewModel(poll);
         _poll = poll;
+        Console.WriteLine(CanEditPoll);
+
         Edit = new RelayCommand(EditAction, CanDoAction);
         Delete = new RelayCommand(DeleteAction, CanDoAction);
         AddCommentCommand = new RelayCommand(AddCommentAction);

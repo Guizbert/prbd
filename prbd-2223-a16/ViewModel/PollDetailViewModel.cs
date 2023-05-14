@@ -18,6 +18,10 @@ internal class PollDetailViewModel : ViewModelCommon {
     public ICommand AddAllParticipantsCommand { get; set; }
     public ICommand Delete { get; set; }
     public ICommand AddChoiceCommand {get;set;}
+
+    public ICommand DeleteChoiceCommand { get; set;}
+    public ICommand UpdateChoiceCommand { get; set;}
+    public ICommand DeleteParticipantCommand { get; set;}
     private string _choiceLabel { get; set; }
     public string ChoiceLabel {
         get => _choiceLabel;
@@ -66,6 +70,9 @@ internal class PollDetailViewModel : ViewModelCommon {
         get {
             return Poll.AllUsers;
         }
+        set {
+            AllParticipants= value;
+        }
     }
     public static PollType[] getTypevalues => Poll.getTypes();
 
@@ -87,6 +94,13 @@ internal class PollDetailViewModel : ViewModelCommon {
             _selectedUser = value;
             RaisePropertyChanged(nameof(SelectedUser));
         }
+    }
+
+    private User _selectedUserToDelete;
+
+    public User SelectedUserToDelete {
+        get => _selectedUserToDelete;
+        set => SetProperty(ref _selectedUserToDelete, value);
     }
 
    
@@ -159,13 +173,13 @@ internal class PollDetailViewModel : ViewModelCommon {
     public PollDetailViewModel(Poll poll, bool isNew)
     {
         Poll = poll;
-        IsNew= isNew;
+        IsNew = isNew;
         if (UserParticipants == null) {
             UserParticipants = new ObservableCollection<User>();
         }
         if (Choices == null) {
             Choices = new ObservableCollection<Choice>();
-        }   
+        }
         Save = new RelayCommand(SaveAction, CanSaveAction);
         Cancel = new RelayCommand(CancelAction, CanCancelAction);
         //Delete = new RelayCommand(DeleteAction, () => !IsNew);
@@ -174,6 +188,13 @@ internal class PollDetailViewModel : ViewModelCommon {
 
         AddMyselfCommand = new RelayCommand(AddMyself);
         AddAllParticipantsCommand = new RelayCommand(AddAll);
+
+        Console.WriteLine(SelectedUserToDelete + "<---- ? Selected user to delete pouet pouet (Main)");
+        DeleteParticipantCommand = new RelayCommand(DeleteParticipant, () => SelectedUserToDelete != null);
+        Console.WriteLine(SelectedUserToDelete + "<---- ? Selected user to delete pouet pouet (Main (Après creation relayComman))");
+
+        //DeleteChoiceCommand = new RelayCommand(DeleteChoice);
+        //UpdateChoiceCommand = new RelayCommand(UpdateChoice);
 
         RaisePropertyChanged();
         refreshList();
@@ -197,7 +218,11 @@ internal class PollDetailViewModel : ViewModelCommon {
         }
         RaisePropertyChanged(nameof(UserParticipants));
     }
- 
+    private void DeleteParticipant() {
+        Console.WriteLine(SelectedUserToDelete + "<---- ? Selected user to delete pouet pouet (fonction DeleteParticipant)");
+        UserParticipants.Remove(SelectedUserToDelete); // remove l'utilisateur sélectionné de la liste des participants
+        refreshList();
+    }
 
     public override void SaveAction()
     {
@@ -233,6 +258,13 @@ internal class PollDetailViewModel : ViewModelCommon {
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
         NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
     }
+
+    //private void DeleteChoice() {
+
+    //}
+    //private void UpdateChoice() {
+
+    //}
 
     private bool CanSaveAction() {
         if (IsNew) {

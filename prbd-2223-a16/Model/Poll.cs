@@ -82,9 +82,16 @@ public class Poll : EntityBase<MyPollContext> {
     [NotMapped]
     public static IEnumerable<User> AllUsers {
         get {
-          return Context.Users.ToList();
+          return Context.Users.OrderBy(u => u.FullName).ToList();
         }
     }
+
+    //public static IEnumerable<User> AllUsers2(Poll currentPoll) {
+    //    return Context.Users.Where(u => !currentPoll.Participants.Contains(u))
+    //                         .OrderBy(u => u.FullName)
+    //                         .ToList();
+    //}
+
 
     //[NotMapped]
     //public static IEnumerable<string> AllUsers {
