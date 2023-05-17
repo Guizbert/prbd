@@ -1,5 +1,7 @@
-﻿using System.Windows.Input;
+﻿using System.Windows.Controls;
+using System.Windows.Input;
 using MyPoll.Model;
+using MyPoll.View;
 using MyPoll.ViewModel;
 using Newtonsoft.Json.Bson;
 using PRBD_Framework;
@@ -17,10 +19,10 @@ internal class PollChoicesViewModel : ViewModelCommon{
 
     public VoteGridViewModel VoteGridViewModel => _voteGridViewModel;
 
-
-    public PollDetailViewModel PollDetailViewModel {
-        get;
-        set;
+    private UserControl _editPoll;
+    public UserControl PollDetailViewModel {
+        get => _editPoll;
+        set => SetProperty(ref _editPoll, value);
     }
     private bool _canEditPoll;
     public bool CanEditPoll {
@@ -80,13 +82,6 @@ internal class PollChoicesViewModel : ViewModelCommon{
     }
     // editAction et CanDoAction
 
-    public void EditAction() {
-        CanEditPoll = true;
-        Console.WriteLine(CanEditPoll);
-        PollDetailViewModel = new PollDetailViewModel(Poll, false);
-        NotifyColleagues(App.Messages.MSG_CREATE_POLL, Poll);
-    }
-
 
     public bool CanDoAction() {
         return CurrentUser == Poll.Creator || CurrentUser.Role == Role.Administrator;
@@ -104,12 +99,15 @@ internal class PollChoicesViewModel : ViewModelCommon{
     }
 
 
-    public PollChoicesViewModel(Poll poll) {
+    public PollChoicesViewModel(Poll poll, bool isNew) {
         _voteGridViewModel = new VoteGridViewModel(poll);
         _poll = poll;
         Console.WriteLine(CanEditPoll);
 
-        Edit = new RelayCommand(EditAction, CanDoAction);
+        Edit = new RelayCommand( () => {
+            PollDetailViewModel = new PollDetailView(poll, isNew);
+            CanEditPoll = true;
+        });
         Delete = new RelayCommand(DeleteAction, CanDoAction);
         AddCommentCommand = new RelayCommand(AddCommentAction);
         ShowTextBoxCommand = new RelayCommand(ShowTextBox);

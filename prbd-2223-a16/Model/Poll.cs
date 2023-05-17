@@ -74,8 +74,8 @@ public class Poll : EntityBase<MyPollContext> {
             //.Where(c => c.PollId == poll.Id)
             //.OrderByDescending(c => c.Votes.Count())
             //.ToList();
-
             //return choices.FirstOrDefault()?.Label;
+
             return choices;
         }
     }

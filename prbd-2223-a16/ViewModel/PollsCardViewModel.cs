@@ -22,8 +22,17 @@ public class PollsCardViewModel : ViewModelCommon
     public string Creator => Poll.Creator.FullName;
     public int Participants => Poll.Participants.Count;
     public int Votes => Poll.GetTotalVote;
-    public IEnumerable<Choice> BestChoice => Poll.BestChoice;
+    //public IEnumerable<Choice> BestChoice => Poll.BestChoice;
 
+
+    public string BestChoice{
+        get {
+            var bestChoice = "";
+            foreach (var choice in Poll.BestChoice)
+                bestChoice += choice.Label + "\n";
+            return bestChoice;
+        }
+    }
 
     public PollsCardViewModel(Poll poll) {
         Poll = poll;

@@ -19,12 +19,23 @@ public class UserChoiceVoteViewModel : ViewModelCommon
         Console.WriteLine(Vote.Type + " LE VOTTEEEEEEEEEEEEEEEEEEEEEE");
         // faire un boolean pour savoir si le user a voté?
         ChangeVote = new RelayCommand<VoteType>(voteType => {
-            if(CurrentUser.Id == user.Id) {
-                Vote.Type = voteType;
+            if(CurrentUser.Id == user.Id || CurrentUser.Role == Role.Administrator) {
+                if (Vote.Type != VoteType.Empty && voteType != VoteType.Empty) {
+                    Vote.Type = voteType;
+                    Context.Update(Vote);
+                } else if (Vote.Type != VoteType.Empty && voteType == VoteType.Empty) {
+                    Context.Remove(Vote);
+                } else if (Vote.Type == VoteType.Empty && voteType != VoteType.Empty) {
+                    Vote.Type = voteType;
+                    Context.Votes.Add(Vote);
+                } 
+                HasVotedNo = Vote.Type == VoteType.No;
+                HasVotedYes = Vote.Type == VoteType.Yes;
+                HasVotedMaybe = Vote.Type == VoteType.Maybe;
+                NoVote = Vote.Type == VoteType.Empty; //fonctionne pas
+
                 RaisePropertyChanged(nameof(GetCurrentIcon));
                 RaisePropertyChanged(nameof(GetCurrentChoiceColor));
-                Console.WriteLine(GetCurrentIcon + "  <------------- CURRENT x2 ");
-                Console.WriteLine(GetCurrentChoiceColor + "  <------------- CURRENTCOLOR x2 ");
             }
         });
         Console.WriteLine(ChangeVote);
@@ -86,6 +97,16 @@ public class UserChoiceVoteViewModel : ViewModelCommon
         get => _userVote;
         set => SetProperty(ref _userVote, value);
     }
+
+    private bool _noVote;
+    public bool NoVote {
+        get => _noVote;
+        set => SetProperty(ref _noVote, value);
+    }
+    public Brush HasVotedYesColor => HasVotedYes ? Brushes.Green : Brushes.Gray;
+    public Brush HasVotedNoColor => HasVotedYes ? Brushes.Red : Brushes.Gray;
+    public Brush HasVotedMaybeColor => HasVotedYes ? Brushes.OrangeRed : Brushes.Gray;
+    public Brush NoVoteColor => NoVote ? Brushes.White: Brushes.Gray;
     public EFontAwesomeIcon GetCurrentIcon => Vote.Type switch {
         VoteType.Yes => EFontAwesomeIcon.Solid_Check,
         VoteType.No => EFontAwesomeIcon.Solid_Xmark,
@@ -102,5 +123,8 @@ public class UserChoiceVoteViewModel : ViewModelCommon
    
   
 
+    public void DeleteVotes() {
+
+    }
     
 }

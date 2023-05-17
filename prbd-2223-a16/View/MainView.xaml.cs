@@ -19,7 +19,7 @@ public partial class MainView : WindowBase {
             poll => DoCloseTab(poll));
       
         Register<Poll>(App.Messages.MSG_CHOICE_POLL,              // si on veut faire des votes, etc
-            poll => DoDisplayPollElements(poll));
+            poll => DoDisplayPollElements(poll, false));
 
 
         Register<Poll>(App.Messages.MSG_CLOSE_TAB,              // si on veut faire des votes, etc
@@ -32,9 +32,9 @@ public partial class MainView : WindowBase {
     private void DoDisplayPoll(Poll poll, bool isNew) {
             OpenTab(isNew ? "<New Poll>" : poll.Name, poll.Name,() => new PollDetailView(poll, isNew));
     }
-    private void DoDisplayPollElements(Poll poll) {
+    private void DoDisplayPollElements(Poll poll, bool isNew) {
         if(poll != null) {
-            OpenTab(poll.Name, poll.Name, () => new PollChoicesView(poll));
+            OpenTab(poll.Name, poll.Name, () => new PollChoicesView(poll, isNew));
         }
     }
 

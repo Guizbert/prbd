@@ -30,7 +30,7 @@
                 <Button Padding="2" BorderBrush="Transparent" Background="Transparent" Width="32"
                     Command="{Binding ChangeVote}" CommandParameter="{x:Static m:VoteType.Yes}" Height="31">
                     <fa:FontAwesome Icon="Solid_Check"
-                                Foreground="{c:Binding HasVotedYes ? media:Brushes.Green : media:Brushes.LightGray}"
+                                Foreground="{c:Binding 'HasVotedYes ? media:Brushes.Green : media:Brushes.LightGray'}"
                                 ToolTip="Yes"
                                 FontSize="25" Width="32"/>
                 </Button>
@@ -38,7 +38,7 @@
                 <Button Padding="2" BorderBrush="Transparent" Background="Transparent" Width="32" 
                     Command="{Binding ChangeVote}" CommandParameter="{x:Static m:VoteType.Maybe}" Height="34">
                     <fa:FontAwesome Icon="Solid_CircleQuestion" 
-                                Foreground="{c:Binding HasVotedMaybe ? media:Brushes.Yellow : media:Brushes.LightGray}"
+                                Foreground="{c:Binding 'HasVotedMaybe ? media:Brushes.OrangeRed : media:Brushes.LightGray'}"
                                 ToolTip="Maybe"
                                 FontSize="25"/>
                 </Button>
@@ -47,7 +47,7 @@
                 <Button Padding="2" BorderBrush="Transparent" Background="Transparent" Width="32" Margin="-90,60,1,1"
                     Command="{Binding ChangeVote}" CommandParameter="{x:Static m:VoteType.No}">
                     <fa:FontAwesome Icon="Solid_Xmark"
-                                Foreground="{c:Binding HasVotedNo ? media:Brushes.Red : media:Brushes.LightGray}"
+                                Foreground="{c:Binding 'HasVotedNo ? media:Brushes.Red : media:Brushes.LightGray'}"
                                 ToolTip="No"
                                 FontSize="25" />
                 </Button>

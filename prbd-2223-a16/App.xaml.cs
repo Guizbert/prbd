@@ -21,6 +21,7 @@ public partial class App : ApplicationBase<User, MyPollContext > {
         MSG_DELETE_COMMENT,         // supprimer commentaire
         MSG_UPDATE_COMMENT,         // edit commentaire
 
+
         MSG_CREATE_VOTE,            //etc 
         MSG_DELETE_VOTE,
         MSG_UPDATE_VOTE,
@@ -53,7 +54,7 @@ public partial class App : ApplicationBase<User, MyPollContext > {
 
     private static void PrepareDatabase() {
         // Clear database and seed data
-        Context.Database.EnsureDeleted();
+        //Context.Database.EnsureDeleted();
         Context.Database.EnsureCreated();
 
         // Cold start

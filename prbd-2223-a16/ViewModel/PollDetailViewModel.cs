@@ -112,8 +112,6 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(ref _participants, value, () => AddParticipant());
     }
 
-
-
     private ObservableCollection<Choice> _choices;
     public ObservableCollection<Choice> Choices {
         get => _choices;
@@ -136,8 +134,6 @@ internal class PollDetailViewModel : ViewModelCommon {
             UserParticipants.Add(SelectedUser); // Ajouter l'utilisateur sélectionné à la liste de participants
         } else {
             Console.WriteLine("peut pas l'ajouter");
-
-            
         }
         Console.WriteLine("User Participants : ");
         foreach (User u in UserParticipants) {
@@ -174,12 +170,14 @@ internal class PollDetailViewModel : ViewModelCommon {
     {
         Poll = poll;
         IsNew = isNew;
-        if (UserParticipants == null) {
+        if(!IsNew) {
+            UserParticipants = new ObservableCollection<User>(Poll.Participants);
+            Choices = new ObservableCollection<Choice>(poll.Choices);
+        } else {
             UserParticipants = new ObservableCollection<User>();
-        }
-        if (Choices == null) {
             Choices = new ObservableCollection<Choice>();
         }
+
         Save = new RelayCommand(SaveAction, CanSaveAction);
         Cancel = new RelayCommand(CancelAction, CanCancelAction);
         //Delete = new RelayCommand(DeleteAction, () => !IsNew);
@@ -193,11 +191,15 @@ internal class PollDetailViewModel : ViewModelCommon {
         DeleteParticipantCommand = new RelayCommand(DeleteParticipant, () => SelectedUserToDelete != null);
         Console.WriteLine(SelectedUserToDelete + "<---- ? Selected user to delete pouet pouet (Main (Après creation relayComman))");
 
+        
         //DeleteChoiceCommand = new RelayCommand(DeleteChoice);
         //UpdateChoiceCommand = new RelayCommand(UpdateChoice);
 
         RaisePropertyChanged();
         refreshList();
+    }
+    public PollDetailViewModel() {
+       
     }
     public void refreshList() {
         //Poll.Participants = Participants;
@@ -226,7 +228,6 @@ internal class PollDetailViewModel : ViewModelCommon {
 
     public override void SaveAction()
     {
-        Console.WriteLine(Poll.Id + " 1 ");
         if (IsNew) {
             var newPoll = new Poll(
                 Title = Title,
@@ -234,25 +235,19 @@ internal class PollDetailViewModel : ViewModelCommon {
                 SelectedPollType = SelectedPollType,
                 IsClosed = IsClosed);
             Context.Add(newPoll);
-            Context.SaveChanges();
             Poll = newPoll; // pour récup l'id
+            newPoll.Participants = UserParticipants;
+            newPoll.Choices = Choices;
+            Context.SaveChanges();
+
             NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
-
-
             IsNew = false;
+        } else {
+            Poll.Participants = UserParticipants;
+            Poll.Choices = Choices;
+            Context.Update(Poll);
         }
 
-        foreach (var user in UserParticipants) {
-            var newParti = new Participation(Poll.Id, user.Id);
-            Context.Participations.Add(newParti);
-        }
-        Context.SaveChanges();
-
-
-        foreach (var choice in Choices) {
-            var newChoice = new Choice(Poll.Id, choice.Label) ;
-            Context.Choices.Add(newChoice);
-        }
         Context.SaveChanges();
 
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
@@ -269,8 +264,7 @@ internal class PollDetailViewModel : ViewModelCommon {
     private bool CanSaveAction() {
         if (IsNew) {
             return
-                !string.IsNullOrEmpty(Title) &&
-                UserParticipants.Count >0 && Choices.Count > 0;
+                !string.IsNullOrEmpty(Title) ;
         }
         return Poll != null &&
             Poll.IsModified &&
