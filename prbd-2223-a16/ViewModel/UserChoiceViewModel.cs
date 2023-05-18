@@ -97,6 +97,16 @@ public class UserChoiceViewModel : ViewModelCommon
     }
 
     private void Delete() {
+        // Remove votes from the current poll
+        var currentChoicesId = _choices.Select(c => c.Id).ToList();
+        var voteToDelete = User.Votes.Where(v => currentChoicesId.Contains(v.Choice.Id)).ToList();
+        foreach (var vote in voteToDelete) {
+            User.Votes.Remove(vote);
+        }
+
+        // Save the changes and refresh the voting choices
+        Context.SaveChanges();
+
 
         VoteVM.Clear(); 
         Context.SaveChanges();

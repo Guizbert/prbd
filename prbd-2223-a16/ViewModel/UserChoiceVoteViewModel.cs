@@ -29,14 +29,14 @@ public class UserChoiceVoteViewModel : ViewModelCommon
                     Vote.Type = voteType;
                     Context.Votes.Add(Vote);
                 } 
-                HasVotedNo = Vote.Type == VoteType.No;
-                HasVotedYes = Vote.Type == VoteType.Yes;
-                HasVotedMaybe = Vote.Type == VoteType.Maybe;
-                NoVote = Vote.Type == VoteType.Empty; //fonctionne pas
-
-                RaisePropertyChanged(nameof(GetCurrentIcon));
-                RaisePropertyChanged(nameof(GetCurrentChoiceColor));
+                
             }
+            HasVotedNo = Vote.Type == VoteType.No;
+            HasVotedYes = Vote.Type == VoteType.Yes;
+            HasVotedMaybe = Vote.Type == VoteType.Maybe;
+            NoVote = Vote.Type == VoteType.Empty; //fonctionne pas
+            RaisePropertyChanged(nameof(GetCurrentIcon));
+            RaisePropertyChanged(nameof(GetCurrentChoiceColor));
         });
         Console.WriteLine(ChangeVote);
         Console.WriteLine(GetCurrentIcon + "  <------------- CURRENTCOLOR ");

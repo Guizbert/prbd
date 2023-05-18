@@ -12,7 +12,7 @@ public partial class App : ApplicationBase<User, MyPollContext > {
         MSG_CREATE_POLL,            // nouveau poll
         MSG_CREATED_POLL,           // création poll
         MSG_DISPLAY_POLL,           // afficher les polls
-        MSG_CHOICE_POLL,           // afficher les polls
+        MSG_CHOICE_POLL,            // afficher les polls
         MSG_DELETE_POLL,            // supprimer poll
         MSG_UPDATE_POLL,            // mettre à jour poll
         MSG_EDIT_POLL,              // pour aller sur la page edit de poll
@@ -54,7 +54,7 @@ public partial class App : ApplicationBase<User, MyPollContext > {
 
     private static void PrepareDatabase() {
         // Clear database and seed data
-        //Context.Database.EnsureDeleted();
+        Context.Database.EnsureDeleted();
         Context.Database.EnsureCreated();
 
         // Cold start

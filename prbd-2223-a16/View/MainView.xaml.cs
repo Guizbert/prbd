@@ -11,9 +11,6 @@ public partial class MainView : WindowBase {
 
         Register<Poll>(App.Messages.MSG_CREATE_POLL,
             poll => DoDisplayPoll(poll, true));
-
-       //Register<Poll>(App.Messages.MSG_CREATE_POLL,                 // si le user veut edit un poll
-       //     poll => DoDisplayPoll(poll, false));
         
         Register<Poll>(App.Messages.MSG_CREATED_POLL,             // CLOSE TAB après creation poll
             poll => DoCloseTab(poll));

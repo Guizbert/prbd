@@ -51,7 +51,8 @@ public class Poll : EntityBase<MyPollContext> {
         Name = name;
         CreatorId = creatorId;
         Closed = isClosed;
-    }public Poll( string name, int creatorId, PollType type,  bool isClosed) {
+    }
+    public Poll( string name, int creatorId, PollType type,  bool isClosed) {
         Name = name;
         CreatorId = creatorId;
         Type= type;
@@ -68,50 +69,16 @@ public class Poll : EntityBase<MyPollContext> {
             var maxScore = Choices.Select(c => c.Votes.Sum(v => v.Value)).Max();
             if (maxScore == 0) return new List<Choice>();
             var choices = Choices.Where(c => c.Votes.Sum(v => v.Value) == maxScore).ToList();
-
-            //var choices = Context.Choices
-            //.Include(c => c.Votes)
-            //.Where(c => c.PollId == poll.Id)
-            //.OrderByDescending(c => c.Votes.Count())
-            //.ToList();
-            //return choices.FirstOrDefault()?.Label;
-
             return choices;
         }
     }
+
     [NotMapped]
     public static IEnumerable<User> AllUsers {
         get {
           return Context.Users.OrderBy(u => u.FullName).ToList();
         }
     }
-
-    //public static IEnumerable<User> AllUsers2(Poll currentPoll) {
-    //    return Context.Users.Where(u => !currentPoll.Participants.Contains(u))
-    //                         .OrderBy(u => u.FullName)
-    //                         .ToList();
-    //}
-
-
-    //[NotMapped]
-    //public static IEnumerable<string> AllUsers {
-    //    get {
-    //        return Participants.Select(p => p.FullName);
-    //    }
-    //}
-
-    //[NotMapped]
-    //public static IEnumerable<User> AllUsers => Context.Users.ToList().Except(ParticipatingUsers());
-
-    //[NotMapped]
-    //public static IEnumerable<User> UsersNotParticipating {
-    //    get {
-    //        return Context.Users.Where(u => !Participants.Contains(u));
-    //    }
-    //}
-
-
-
     public bool HasVoted(User currentUser) {
         return Choices.Any(c => c.CheckUserVotedOnce(currentUser));
     }
@@ -122,11 +89,18 @@ public class Poll : EntityBase<MyPollContext> {
         }
     }
     public static IQueryable<Poll> GetPolls(User CurrentUser) {
-        var allPolls = (Context.Polls
+
+        if (CurrentUser.Role == Role.Administrator) {
+            var allPollsAdmin = (Context.Polls
+                .OrderBy(p => p.Name));
+            return allPollsAdmin;
+        } else {
+            var allPolls = (Context.Polls
             .Where(poll => poll.Creator.Email.Contains(CurrentUser.Email) ||
                     poll.Participants.Contains(CurrentUser))
             .OrderBy(poll => poll.Name));
-       return allPolls;
+            return allPolls;
+        }
     }
 
 
@@ -148,7 +122,6 @@ public class Poll : EntityBase<MyPollContext> {
             commentaires.Clear();
             
         }
-
         Context.Polls.Remove(this);
         Context.SaveChanges();
     }
