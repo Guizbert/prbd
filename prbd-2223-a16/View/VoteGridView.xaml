@@ -14,76 +14,74 @@
         <vm:VoteGridViewModel />
     </UserControl.DataContext>
 
-    <ScrollViewer HorizontalScrollBarVisibility="Auto">
 
-        <StackPanel Orientation="Vertical" Height="auto" Margin="10,10,10,10" 
-                    HorizontalAlignment="Center" VerticalAlignment="Center">
+    <StackPanel Orientation="Vertical" Height="auto" Margin="10,10,10,10" 
+                HorizontalAlignment="Center" VerticalAlignment="Center">
 
-            <!-- La partie Header -->
-            <StackPanel Orientation="Horizontal" MinHeight="50">
+        <!-- La partie Header -->
+        <StackPanel Orientation="Horizontal" MinHeight="50">
 
-                <!-- Le titre de la colonne "Participants" -->
-                <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Width="100">
-                    <Border x:Name="Border" DockPanel.Dock="Bottom" BorderBrush="Black" BorderThickness="1,1,0,1"
-                            SnapsToDevicePixels="True" Background="#FFE6E6E6" Margin="0" Height="30">
-                        <Grid Width="auto">
-                            <TextBlock Text="Participants" Margin="5" Padding="0" HorizontalAlignment="Stretch"
-                                       VerticalAlignment="Bottom"    
-                                       Width="auto" Height="auto" TextAlignment="Center" TextWrapping="Wrap"
-                                       FontWeight="Bold">
-                            </TextBlock>
-                        </Grid>
-                    </Border>
-                </DockPanel>
-
-                <ItemsControl ItemsSource="{Binding Choices}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border BorderBrush="Black" BorderThickness="1,1,0,1" SnapsToDevicePixels="True"
-                                    Background="#FFE6E6E6" HorizontalAlignment="Stretch" Width="100" >
-                                <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                    <TextBlock Text="{Binding Label}" Padding="5" HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               Width="auto" TextAlignment="Center" TextWrapping="Wrap"
-                                               FontWeight="Bold">
-                                    </TextBlock>
-                                </DockPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <Border BorderBrush="Black" BorderThickness="1, 0, 0, 0" Width="60">
-                    <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
-                        <Border DockPanel.Dock="Bottom" BorderBrush="Black" BorderThickness="0,1,1,1"
-                                SnapsToDevicePixels="True" Background="#FFE6E6E6" Margin="0" VerticalAlignment="Bottom" Height="30">
-                            <Grid Width="auto">
-                                <TextBlock Text="Actions" Margin="5" Padding="0" HorizontalAlignment="Center"
-                                           Width="auto" Height="auto" TextAlignment="Center" TextWrapping="Wrap"
-                                           FontWeight="Bold">
-                                </TextBlock>
-                            </Grid>
-                        </Border>
-                    </DockPanel>
+            <!-- Le titre de la colonne "Participants" -->
+            <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Width="100">
+                <Border x:Name="Border" DockPanel.Dock="Bottom" BorderBrush="Black" BorderThickness="1,1,0,1"
+                        SnapsToDevicePixels="True" Background="#FFE6E6E6" Margin="0" Height="30">
+                    <Grid Width="auto">
+                        <TextBlock Text="Participants" Margin="5" Padding="0" HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Bottom"    
+                                    Width="auto" Height="auto" TextAlignment="Center" TextWrapping="Wrap"
+                                    FontWeight="Bold">
+                        </TextBlock>
+                    </Grid>
                 </Border>
-            </StackPanel>
+            </DockPanel>
 
-
-            <ItemsControl ItemsSource="{Binding UserVm}">
+            <ItemsControl ItemsSource="{Binding Choices}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <vw:UserChoiceView/>
+                        <Border BorderBrush="Black" BorderThickness="1,1,0,1" SnapsToDevicePixels="True"
+                                Background="#FFE6E6E6" HorizontalAlignment="Stretch" Width="100" >
+                            <DockPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                <TextBlock Text="{Binding Label}" Padding="5" HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Width="auto" TextAlignment="Center" TextWrapping="Wrap"
+                                            FontWeight="Bold">
+                                </TextBlock>
+                            </DockPanel>
+                        </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
+            <Border BorderBrush="Black" BorderThickness="1, 0, 0, 0" Width="60">
+                <DockPanel VerticalAlignment="Bottom" HorizontalAlignment="Stretch">
+                    <Border DockPanel.Dock="Bottom" BorderBrush="Black" BorderThickness="0,1,1,1"
+                            SnapsToDevicePixels="True" Background="#FFE6E6E6" Margin="0" VerticalAlignment="Bottom" Height="30">
+                        <Grid Width="auto">
+                            <TextBlock Text="Actions" Margin="5" Padding="0" HorizontalAlignment="Center"
+                                        Width="auto" Height="auto" TextAlignment="Center" TextWrapping="Wrap"
+                                        FontWeight="Bold">
+                            </TextBlock>
+                        </Grid>
+                    </Border>
+                </DockPanel>
+            </Border>
         </StackPanel>
 
-    </ScrollViewer>
+
+        <ItemsControl ItemsSource="{Binding UserVm}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <vw:UserChoiceView/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+    </StackPanel>
+
 
 </f:UserControlBase>

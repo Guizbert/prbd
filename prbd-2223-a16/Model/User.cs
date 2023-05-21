@@ -20,9 +20,10 @@ public class User : EntityBase<MyPollContext> {
     public Role Role { get; protected set; } = Role.Member;
 
     public virtual ICollection<Vote> Votes{ get; set; } = new HashSet<Vote>();
+    //collection des polls du user
     public virtual ICollection<Poll> UserPolls{ get; set; } = new HashSet<Poll>();
 
-    [InverseProperty(nameof(Poll.Creator))]
+    [InverseProperty(nameof(Poll.Creator))] 
     public virtual ICollection<Poll> participatingIn{ get; set; } = new HashSet<Poll>();
     //2e iColl de poll pour les participations;
     public virtual ICollection<Comment> Comments{ get; set; } = new HashSet<Comment>();
@@ -36,6 +37,7 @@ public class User : EntityBase<MyPollContext> {
 
 
     public bool isAdmin() { return this.Role == Role.Administrator; }
+
     /**
      *  TODO :
      *  

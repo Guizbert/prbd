@@ -58,7 +58,7 @@
                                     <Button fap:FontAwesome.Icon="Regular_TrashCan" Foreground="red"  Background="Transparent" BorderBrush="Transparent"
                                         Width="20" FontSize="15" Margin="10,0,0,0" Padding="2"
                                         Command="{Binding DataContext.DeleteParticipantCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
-                                            CommandParameter="{Binding}"  /> <!--doit faire ça dans user pas dans le vm-->
+                                            CommandParameter="{Binding}"  /> 
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -74,16 +74,35 @@
 
                 <StackPanel Margin="30,0,0,0" Width="343">
                     <Label FontWeight="Bold" FontSize="15" Content="Choix" Height="37"/>
-                    <ListBox ItemsSource="{Binding Choices}" Height="90">
+                    <ListBox ItemsSource="{Binding Choices}" Height="90" SelectionMode="Single" Name="lstChoice"
+                                 SelectedItem="{Binding SelectedChoice}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
+                                    <StackPanel.Style>      <!--c'est censé faire la textBox?-->
+                                        <Style TargetType="StackPanel">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding DataContext.IsEditingChoice}" Value="True">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </StackPanel.Style>
                                     <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis"/>
+                                    
+                                    <!--btn edit-->
+                                    <Button fap:FontAwesome.Icon="Regular_PenToSquare" Foreground="DodgerBlue" Width="20"
+                                        FontSize="15" Margin="10, 0 ,0 ,0"
+                                        Padding="2" Background="Transparent" BorderBrush="Transparent" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                        Command="{Binding DataContext.UpdateChoiceCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
+                                        CommandParameter="{Binding}"  />
+
+                                    <!--btn delete-->
                                     <Button fap:FontAwesome.Icon="Regular_TrashCan" Foreground="red" Width="20"
                                         FontSize="15" Margin="10, 0 ,0 ,0"
                                         Padding="2" Background="Transparent" BorderBrush="Transparent" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                        Command="{Binding DeleteCommand}" />
-                                    <!--mettre delete choix-->
+                                        Command="{Binding DataContext.DeleteChoiceCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
+                                            CommandParameter="{Binding}"  />
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>

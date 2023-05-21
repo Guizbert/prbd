@@ -8,12 +8,12 @@
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=vm:PollsCardViewModel, IsDesignTimeCreatable=False}"
              d:DesignHeight="600" d:DesignWidth="900">
-    <StackPanel Background="{Binding PollStateColor}">
-        <TextBlock FontSize="14" FontWeight="Bold" Width="150" TextAlignment="Center" Text="{Binding Name}" />
-        <TextBlock FontSize="14"  Width="150" TextAlignment="Center" Text="{Binding Creator}" />
-        <TextBlock FontSize="14"  Width="150" TextAlignment="Center" Text="{Binding Participants, StringFormat='{}{0} participants'}" />
-        <TextBlock FontSize="14"  Width="160" TextAlignment="Center" Text="{Binding Votes, StringFormat='{}{0} Votes'}" />
-        <TextBlock FontSize="14"  Width="250" Height="100" TextAlignment="Center"
+    <StackPanel Background="{Binding PollStateColor}" >
+        <TextBlock FontSize="14" FontWeight="Bold" Width="150" TextAlignment="Center" TextWrapping="Wrap" Text="{Binding Name}" />
+        <TextBlock FontSize="14"  Width="150" TextAlignment="Center" Text="{Binding Creator}" TextWrapping="Wrap" />
+        <TextBlock FontSize="14"  Width="150" TextAlignment="Center" Text="{Binding Participants, StringFormat='{}{0} participants'}" TextWrapping="Wrap" />
+        <TextBlock FontSize="14"  Width="160" TextAlignment="Center" Text="{Binding Votes, StringFormat='{}{0} Votes'}" TextWrapping="Wrap" />
+        <TextBlock FontSize="14"  Width="250" Height="100" TextAlignment="Center"  TextWrapping="Wrap"
            Text="{Binding BestChoice}"/>
     </StackPanel>
 

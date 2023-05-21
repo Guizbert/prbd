@@ -16,6 +16,7 @@ public class UserChoiceViewModel : ViewModelCommon
 
         _choices = choices;
 
+        Poll = voteGridViewModel.Poll;
         User = user;
         RefreshVote();
 
@@ -25,6 +26,7 @@ public class UserChoiceViewModel : ViewModelCommon
         DeleteCommand = new RelayCommand(Delete);
     }
 
+    public Poll Poll { get; set ; }
     private VoteGridViewModel _voteGridViewModel;
     public ICommand EditCommand { get; }
     public ICommand SaveCommand { get; }
@@ -37,7 +39,7 @@ public class UserChoiceViewModel : ViewModelCommon
 
     private bool _editMode;
 
-    public bool IsActionVisible => CurrentUser == User || CurrentUser.Role == Role.Administrator;
+    public bool IsActionVisible => !_voteGridViewModel.Poll.Closed &&( CurrentUser == User || CurrentUser.Role == Role.Administrator);
 
     // La visbilité des boutons de sauvegarde et d'annulation sont bindés sur cette propriété
     public bool EditMode {
@@ -78,7 +80,7 @@ public class UserChoiceViewModel : ViewModelCommon
     private void RefreshVote() {
         // VoteVM est la liste qui servira de source pour la balise <ItemsControl>
         VoteVM = _choices
-            .Select(c => new UserChoiceVoteViewModel(User, c))        // mettre la vue avec les choix
+            .Select(c => new UserChoiceVoteViewModel(User, c, Poll))        // mettre la vue avec les choix
             .ToList();
     }
     private void Save() {

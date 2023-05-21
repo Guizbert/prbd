@@ -44,15 +44,6 @@ public class MyPollContext : DbContextBase {
             .WithMany(p => p.Participants)
             .UsingEntity(j => j.ToTable("Participation"));
 
-
-        /*modelBuilder.Entity<User>()
-                .HasMany(u => u.Choices)
-                .WithOne(c => c.User)
-                .HasForeignKey(c => c.UserId)
-                .OnDelete(DeleteBehavior.Cascade);*/
-
-       
-
         modelBuilder.Entity<User>()
             .HasMany(u => u.UserPolls)
             .WithMany(p => p.Participants)
@@ -121,26 +112,8 @@ public class MyPollContext : DbContextBase {
             .HasForeignKey(c => c.PollId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        // -----------
-        //modelBuilder.Entity<Participation>()
-        //    .HasKey(p => new { p.PollId, p.UserId });
-
         modelBuilder.Entity<Participation>()
             .Property(p => p.UserId);
-
-        /* modelBuilder.Entity<Participation>()
-             .HasOne(p => p.Poll)
-             .WithMany(p => p.Participations)
-             .HasForeignKey(p => p.PollId)
-             .OnDelete(DeleteBehavior.Cascade);
-
-         modelBuilder.Entity<Participation>()
-             .HasOne(p => p.User)
-             .WithMany(u => u.UserParticipants)
-             .HasForeignKey(p => p.UserId)
-             .OnDelete(DeleteBehavior.Cascade);*/
-
-        // --------
 
         modelBuilder.Entity<Vote>()
             .HasKey(v => new { v.UserId, v.ChoiceId });

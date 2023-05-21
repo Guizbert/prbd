@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Collections.ObjectModel;
+using System.Windows.Controls;
 using System.Windows.Input;
 using MyPoll.Model;
 using MyPoll.View;
@@ -29,7 +30,7 @@ internal class PollChoicesViewModel : ViewModelCommon{
         get => _canEditPoll;
         set=> SetProperty(ref _canEditPoll, value);
     }
-    public bool IsCreator => CurrentUser == Poll.Creator;
+    public bool IsCreator => CurrentUser == Poll.Creator || CurrentUser.Role == Role.Administrator;
     public bool CanReoPen => CurrentUser == Poll.Creator && Poll.Closed;
 
     // afficher en haut de la page:
@@ -45,17 +46,23 @@ internal class PollChoicesViewModel : ViewModelCommon{
         get => _addComment;
         set => SetProperty(ref _addComment, value, () => ShowTextBox());
     }
-    public bool CanAddComment => AddComment == true;
     //Liste des commentaires :
+
+    //public ICollection<Comment> Commentaire() => Poll.commentaires;
+
+    private ObservableCollection<Comment> _commentaire;
+    public ObservableCollection<Comment> Commentaire {
+        get => _commentaire;
+        set => SetProperty(ref _commentaire, value, () => AddCommentAction());
+    }
+
+
     // si current User = personne qui a fait un commentaire alors afficher poubelle
-
-    public ICollection<Comment> Commentaire() => Poll.commentaires;
-
-
     // si Creator afficher bouton edit et Delete
     public ICommand Edit { get; set; }
     public ICommand Delete { get; set; }
     public ICommand AddCommentCommand { get; set; }
+    public ICommand DeleteCommentCommand { get; set; }
     public ICommand ShowTextBoxCommand { get; set; }
 
 
@@ -63,28 +70,61 @@ internal class PollChoicesViewModel : ViewModelCommon{
 
     public string TextToAdd {
         get => _textToAdd;
-        set => SetProperty(ref _textToAdd, value, () => AddCommentAction());
+        set {
+            if (!string.Equals(_textToAdd, value)) {
+                _textToAdd = value;
+                RaisePropertyChanged();
+            }
+        }
     }
     public void ShowTextBox() {
-        if (!AddComment)
-            AddComment = !AddComment;
-        Console.WriteLine(AddComment + " Can write ? <--------");
 
+        AddComment = true;
+        Console.WriteLine(AddComment + " Can write ? <--------");
     }
     public void AddCommentAction() {
-        if(TextToAdd != null) {
-            var comment = new Comment(CurrentUser, Poll, TextToAdd, DateTime.Now);
-            Poll.commentaires.Add(comment);
-            Context.Add(comment);
-            Context.SaveChanges();
-            AddComment= false;
+        if (string.IsNullOrEmpty(TextToAdd)) {
+            // Le Text est vide ou null -> ne rien faire
+            return;
         }
+        if (Poll.commentaires.Any(c => c.Text == TextToAdd)) {
+            return;
+        }
+        else{
+            var comment = new Comment(CurrentUser, Poll, TextToAdd, DateTime.Now);
+            Context.Comments.Add(comment);
+
+            Context.SaveChanges();
+            Commentaire.Add(comment);
+            Poll.commentaires.Add(comment);
+            TextToAdd = string.Empty;
+            refreshComm();
+
+        }
+        RaisePropertyChanged();
+
+    }
+
+    public void refreshComm() {
+        if (AddComment) {
+            AddComment = false;
+        }
+        Console.WriteLine(AddComment);
+        foreach(var comm in Commentaire) {
+            Console.WriteLine(comm.Text);
+        }
+        RaisePropertyChanged(nameof(Commentaire));
     }
     // editAction et CanDoAction
 
 
     public bool CanDoAction() {
         return CurrentUser == Poll.Creator || CurrentUser.Role == Role.Administrator;
+    }
+
+
+    public bool CanDeleteComment(Comment comment) {
+        return Commentaire.Where(c => c == comment && c.Creator == CurrentUser).Any();
     }
 
 
@@ -97,18 +137,34 @@ internal class PollChoicesViewModel : ViewModelCommon{
         }
         //CancelAction();
     }
+    private void DeleteCommentAction(Comment comment) {
+        Console.WriteLine(CanDeleteComment(comment));
+       // var canDelete = Commentaire.Where(c => c == comment && c.Creator == CurrentUser || CurrentUser.Role == Role.Administrator).Any();
+
+       // if (canDelete) {
+            Commentaire.Remove(comment);
+            Context.Remove(comment);
+            Poll.commentaires.Remove(comment);
+            Context.SaveChanges();  
+       // }
+              
+    }
 
 
     public PollChoicesViewModel(Poll poll, bool isNew) {
         _voteGridViewModel = new VoteGridViewModel(poll);
         _poll = poll;
-        Console.WriteLine(CanEditPoll);
-
+        if (Poll.commentaires == null) {
+            Commentaire = new ObservableCollection<Comment>();
+        }else {
+            Commentaire = new ObservableCollection<Comment>(Poll.commentaires.OrderBy(c => c.Timestamp));
+        }
         Edit = new RelayCommand( () => {
             PollDetailViewModel = new PollDetailView(poll, isNew);
             CanEditPoll = true;
         });
         Delete = new RelayCommand(DeleteAction, CanDoAction);
+        DeleteCommentCommand = new RelayCommand<Comment>(DeleteCommentAction);
         AddCommentCommand = new RelayCommand(AddCommentAction);
         ShowTextBoxCommand = new RelayCommand(ShowTextBox);
 

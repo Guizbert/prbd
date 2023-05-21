@@ -29,7 +29,7 @@ public class PollsCardViewModel : ViewModelCommon
         get {
             var bestChoice = "";
             foreach (var choice in Poll.BestChoice)
-                bestChoice += choice.Label + "\n";
+                bestChoice += choice.Label + "(" + Poll.BestChoiceValue + ")"+ "\n";
             return bestChoice;
         }
     }
@@ -48,8 +48,8 @@ public class PollsCardViewModel : ViewModelCommon
         }
         else if(Poll.HasVoted(CurrentUser)) {
             return "#b3ffb3";
-        }else
-            return "#949494";
+        }
+        return "#949494";
     }
 }
 

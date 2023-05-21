@@ -48,6 +48,6 @@ public class Vote : EntityBase<MyPollContext>
         VoteType.Maybe => 0.5,
         VoteType.No => -1,
         VoteType.Empty => 0,
-        _ => 0 // throw new Exception("bad vote value"),
+        _ =>  throw new Exception("bad vote value"),
     };
 }

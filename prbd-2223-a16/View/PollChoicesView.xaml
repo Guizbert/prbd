@@ -5,8 +5,8 @@
                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                    xmlns:f="clr-namespace:PRBD_Framework;assembly=PRBD_Framework"
                    xmlns:vm="clr-namespace:MyPoll.ViewModel"
-                    xmlns:fa="http://schemas.fontawesome.com/icons/fonts"
-                    xmlns:fap="http://schemas.fontawesome.com/icons/fonts/properties"
+                   xmlns:fa="http://schemas.fontawesome.com/icons/fonts"
+                   xmlns:fap="http://schemas.fontawesome.com/icons/fonts/properties"
                    xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
                    xmlns:mypoll="clr-namespace:MyPoll"
                    xmlns:vw="clr-namespace:MyPoll.View"
@@ -15,79 +15,103 @@
                    d:DesignHeight="450" d:DesignWidth="750"
                    Background="White">
 
+
+
+    <ScrollViewer  VerticalScrollBarVisibility="Auto"  >
         <Grid>
             <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="auto" />
                 <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
+            <ContentControl Content="{Binding PollDetailViewModel}" Grid.Row="2"></ContentControl>
 
-        <Grid Grid.Row="0" Visibility="{Binding CanEditPoll,Converter={f:BoolToCollapsedConverter}}" Background="LightGray">
+            <!-- Titre et créateur -->
+            <Grid Grid.Row="0" Visibility="{Binding CanEditPoll, Converter={f:BoolToCollapsedConverter}}" Background="LightGray">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="{Binding Title}"  FontSize="15" FontWeight="Bold" Grid.Column="0"
-                       TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="{Binding Title}" FontSize="15" FontWeight="Bold" Grid.Column="0" TextTrimming="CharacterEllipsis" />
                 <Label x:Name="creator" Content="created by " Margin="5,0,0,0" Grid.Column="1" />
                 <TextBlock Text="{Binding Creator}" Margin="5" Grid.Column="2" />
             </Grid>
 
-            <Grid Visibility="{Binding CanReoPen, Converter={f:BoolToVisibleConverter}}">
-                <StackPanel Background="LightPink" Orientation="Horizontal" Margin="5,30,407,-27" >
-                    <TextBlock Text="This poll has been closed!" FontWeight="Bold" FontSize="14" Margin="0,0,10,0" Height="19"/>
+            <!-- État du poll -->
+            <Grid Grid.Row="1" Visibility="{Binding CanReoPen, Converter={f:BoolToVisibleConverter}}">
+                <StackPanel Background="LightPink" Orientation="Horizontal" Margin="5">
+                    <TextBlock Text="This poll has been closed!" FontWeight="Bold" FontSize="14" Margin="0,0,10,0" Height="19" />
                     <Button Content="Reopen" Height="23" />
                 </StackPanel>
             </Grid>
-            
-        <ContentControl Content="{Binding PollDetailViewModel}" Grid.Row="1"></ContentControl>
 
-        <StackPanel Grid.Row="1" Visibility="{Binding CanEditPoll,Converter={f:BoolToCollapsedConverter}}">
-            <vw:VoteGridView DataContext="{Binding VoteGridViewModel}"   Grid.Row="1" Margin="22,36,50,28" />
+            <!-- Liste des votes -->
+            <Grid Grid.Row="2" Visibility="{Binding CanEditPoll, Converter={f:BoolToCollapsedConverter}}"  >
+                <vw:VoteGridView DataContext="{Binding VoteGridViewModel}"/>
+            </Grid>
 
-            
-            <StackPanel Orientation="Horizontal" Margin="22,20,50,0" Grid.Row="2">
-                <TextBlock FontWeight="Bold" ><Run Text="Comment" FontSize="15"/><Run Text=" "/>
-                    <Hyperlink  Command="{Binding ShowTextBoxCommand}">
-                        <Run Text="Add comment" FontSize="10"/></Hyperlink></TextBlock>
+
+            <!-- Liste des commentaires -->
+            <StackPanel Grid.Row="4" Visibility="{Binding CanEditPoll, Converter={f:BoolToCollapsedConverter}}">
+                <StackPanel Orientation="Horizontal" Margin="22,20,50,0">
+                    <TextBlock FontWeight="Bold">
+                    <Run Text="Comment" FontSize="17" />
+                    <Run Text=" " />
+                    <Hyperlink Command="{Binding ShowTextBoxCommand}">
+                        <Run Text="Add comment" FontSize="10" />
+                    </Hyperlink>
+                    </TextBlock>
+
+                    <TextBox Text="{Binding TextToAdd, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding AddComment, Converter={f:BoolToVisibleConverter}, Mode=TwoWay}" Margin="171,0,106,0" Width="212" Height="18"/>
+                    <Button Content="Add" Command="{Binding AddCommentCommand}"  Visibility="{Binding AddComment, Converter={f:BoolToVisibleConverter}, Mode=TwoWay}" Margin="5,0"  />
+                </StackPanel>
+
+
+
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="407*"/>
+                        <ColumnDefinition Width="343*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListView ItemsSource="{Binding Commentaire}" Grid.ColumnSpan="2" Margin="10,20,10,0">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,10">
+                                    <TextBlock Text="{Binding Text}" FontWeight="Bold" TextWrapping="Wrap" />
+                                    <TextBlock>
+                                    <Run Text="- " />
+                                    <Run Text="{Binding Creator.FullName}" FontWeight="Bold" Foreground="Blue" />
+                                    <Run Text=", " />
+                                    <Run Text="{Binding Timestamp}" />
+                                    <Button fap:FontAwesome.Icon="Regular_TrashCan" Foreground="red" Width="20" 
+                                        FontSize="15" Margin="10, 0 ,0 ,0"
+                                        Padding="2" Background="Transparent" BorderBrush="Transparent" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                        Command="{Binding DataContext.DeleteCommentCommand, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}"
+                                            Visibility="{Binding DataContext.IsCreator, RelativeSource={RelativeSource AncestorType={x:Type ListView}}, Converter={f:BoolToVisibleConverter}}"
+                                            CommandParameter="{Binding}"  />
+                                    </TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+
             </StackPanel>
 
-            <Grid Grid.Row="2" Margin="72,18,0,124"  Visibility="{Binding CanAddComment, Converter={f:BoolToVisibleConverter}}" Grid.RowSpan="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <TextBox Text="{Binding TextToAdd, UpdateSourceTrigger=PropertyChanged}"
-                Visibility="{Binding AddComment, Converter={f:BoolToVisibleConverter}}" Margin="171,0,106,0" Grid.Column="0" />
+            <!-- Boutons d'édition et de suppression -->
+            <WrapPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Grid.Row="5"  Width="auto" Visibility="{Binding CanEditPoll, Converter={f:BoolToCollapsedConverter}}">
+                <Button Content="Edit" Command="{Binding Edit}" Visibility="{Binding IsCreator, Converter={f:BoolToVisibleConverter}}" Margin="0,0,10,0" Height="24" Width="52" />
+                <Button Content="Delete" Command="{Binding Delete}" Visibility="{Binding IsCreator, Converter={f:BoolToVisibleConverter}}" Height="24" Width="65" />
+            </WrapPanel>
+            
+        </Grid>
+    </ScrollViewer>
 
-                <Button Content="Add" Command="{Binding AddCommentCommand}" Margin="595,0,31,0" />
-            </Grid>
-            <ScrollViewer HorizontalScrollBarVisibility="Auto">
-                <ListView ItemsSource="{Binding Poll.commentaires}" Visibility="{Binding CanEditPoll,Converter={f:BoolToCollapsedConverter}}"  Grid.Row="3" Margin="36,10,36,114">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Margin="0,10">
-                                <TextBlock Text="{Binding Text}" FontWeight="Bold" />
-                                <TextBlock>
-                            <Run Text="- " />
-                            <Run Text="{Binding Creator.FullName}" FontWeight="Bold" Foreground="blue" />
-                            <Run Text=", " />
-                            <Run Text="{Binding Timestamp}" />
-                                </TextBlock>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </ScrollViewer>
 
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="570,64,36,20" Grid.Row="3" Visibility="{Binding CanEditPoll,Converter={f:BoolToCollapsedConverter}}">
-            <Button Content="Edit" Command="{Binding Edit}" Visibility="{Binding IsCreator, Converter={f:BoolToVisibleConverter}}" Margin="0,0,10,0" Height="24" Width="52" />
-            <Button Content="Delete" Command="{Binding Delete}" Visibility="{Binding IsCreator, Converter={f:BoolToVisibleConverter}}" Height="24" Width="65" />
-        </StackPanel>
-    </Grid>
-    
+
 </f:UserControlBase>

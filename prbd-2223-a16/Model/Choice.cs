@@ -18,6 +18,8 @@ public class Choice : EntityBase<MyPollContext> {
     [Required, ForeignKey(nameof(Poll))]
     public int PollId { get; set; }
     public virtual Poll Poll { get; set; }
+
+    [Required]
     public string Label { get; set; }
     public virtual ICollection<Vote> Votes { get; set; }
     public Choice() { }

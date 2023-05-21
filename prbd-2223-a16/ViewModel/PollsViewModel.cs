@@ -48,19 +48,11 @@ public class PollsViewModel : ViewModelCommon
 
         Polls = new ObservableCollection<PollsCardViewModel>(
             polls.Select(p => new PollsCardViewModel(p)));
-
-        //if(Polls != null)
-        //    Polls.Clear();
-        //foreach(var allPolls in polls) {
-        //    var pollCard = new PollsCardViewModel(allPolls);
-        //    Polls.Add(pollCard);
-        //}
     }
     private void ApplyFilterAction() {
 
         if (!string.IsNullOrEmpty(Filter)) {
             IQueryable<Poll> query = Context.Polls;
-
             if (!CurrentUser.isAdmin()) // vérifiez si l'utilisateur est un administrateur
             {
                 query = query.Where(p => p.Participants.Any(parti => parti.Id == CurrentUser.Id)); // filtrez les sondages en fonction de l'utilisateur connecté
@@ -74,16 +66,6 @@ public class PollsViewModel : ViewModelCommon
 
             Polls = filter;
         }
-
-        /*
-        IEnumerable<Poll> query = Context.Polls.OrderBy(p => p.Name);
-
-            query = from p in Context.Polls
-                    where p.Name.Contains(Filter) || p.BestChoice.Contains(Filter) || p.Creator.FullName.Contains(Filter)
-                    orderby p.Name
-                    select p;
-        Polls = new ObservableCollection<PollsCardViewModel>(query.Select(p => new PollsCardViewModel(p)));
-        */
     }
 
     protected override void OnRefreshData() {

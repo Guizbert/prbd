@@ -74,6 +74,16 @@ public class Poll : EntityBase<MyPollContext> {
     }
 
     [NotMapped]
+    public double BestChoiceValue {
+        get {
+            if (Choices.Count == 0) return 0;
+            var maxScore = Choices.Select(c => c.Votes.Sum(v => v.Value)).Max();
+            return maxScore;
+        }
+    }
+    
+
+    [NotMapped]
     public static IEnumerable<User> AllUsers {
         get {
           return Context.Users.OrderBy(u => u.FullName).ToList();
@@ -87,6 +97,13 @@ public class Poll : EntityBase<MyPollContext> {
         get{
             return Choices.Sum(choice => choice.Votes.Count);
         }
+    }
+    public int GetMaxVotePossible() {
+        if (Type == PollType.Single) {
+            return 1; 
+        }
+        return Choices.Count;
+        
     }
     public static IQueryable<Poll> GetPolls(User CurrentUser) {
 

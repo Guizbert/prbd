@@ -11,15 +11,23 @@ namespace MyPoll.ViewModel;
 public class UserChoiceVoteViewModel : ViewModelCommon
 {
 
-    public UserChoiceVoteViewModel(User user, Choice choice) {
+    public UserChoiceVoteViewModel(User user, Choice choice, Poll poll) {
+        Poll = poll;
         UserVoted = user.Votes.Any(v => v.Choice.Id == choice.Id);
+        UserVotedForCurrentPoll = user.Votes.Any(v => v.Choice.Poll == poll);
         _user = user;
         /* on doit récup a la creation de la vue les choix des users (si existant)*/
         Vote = user.Votes.FirstOrDefault(v =>v.Choice.Id == choice.Id)??new Vote() {Choice = choice, User = user, Type = VoteType.Empty };
         Console.WriteLine(Vote.Type + " LE VOTTEEEEEEEEEEEEEEEEEEEEEE");
         // faire un boolean pour savoir si le user a voté?
         ChangeVote = new RelayCommand<VoteType>(voteType => {
-            if(CurrentUser.Id == user.Id || CurrentUser.Role == Role.Administrator) {
+            var maxVote = Poll.GetMaxVotePossible();
+            if (maxVote == 1) {
+                if (UserVotedForCurrentPoll) {
+                    return; // Si le nombre maximum de votes est 1 et le vote est déjà effectué par l'utilisateur, ne rien faire.
+                }
+            }
+            if (CurrentUser.Id == user.Id || CurrentUser.Role == Role.Administrator && !UserVotedForCurrentPoll) {
                 if (Vote.Type != VoteType.Empty && voteType != VoteType.Empty) {
                     Vote.Type = voteType;
                     Context.Update(Vote);
@@ -28,8 +36,7 @@ public class UserChoiceVoteViewModel : ViewModelCommon
                 } else if (Vote.Type == VoteType.Empty && voteType != VoteType.Empty) {
                     Vote.Type = voteType;
                     Context.Votes.Add(Vote);
-                } 
-                
+                }
             }
             HasVotedNo = Vote.Type == VoteType.No;
             HasVotedYes = Vote.Type == VoteType.Yes;
@@ -44,6 +51,7 @@ public class UserChoiceVoteViewModel : ViewModelCommon
         HasVoted = user.Votes.Any(v => v.Choice.Id == choice.Id);
     }
 
+    public Poll Poll { get; set; }
     public Vote Vote { get; private set; }
     public UserChoiceVoteViewModel() { }
 
@@ -96,6 +104,11 @@ public class UserChoiceVoteViewModel : ViewModelCommon
     public bool UserVoted {
         get => _userVote;
         set => SetProperty(ref _userVote, value);
+    }
+    private bool _userVotedForCurrentPoll;
+    public bool UserVotedForCurrentPoll {
+        get => _userVotedForCurrentPoll;
+        set => SetProperty(ref _userVotedForCurrentPoll, value);
     }
 
     private bool _noVote;
