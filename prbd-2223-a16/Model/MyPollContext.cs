@@ -91,7 +91,7 @@ public class MyPollContext : DbContextBase {
             .HasForeignKey(c => c.PollId)
             .OnDelete(DeleteBehavior.Cascade);
         //------------
-
+       
 
         modelBuilder.Entity<Comment>()
             .HasKey(c => c.Id);

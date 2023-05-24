@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using MyPoll.Model;
@@ -44,7 +45,7 @@ internal class PollChoicesViewModel : ViewModelCommon{
     private bool _addComment;
     public bool AddComment {
         get => _addComment;
-        set => SetProperty(ref _addComment, value, () => ShowTextBox());
+        set => SetProperty(ref _addComment, value);
     }
     //Liste des commentaires :
 
@@ -65,6 +66,11 @@ internal class PollChoicesViewModel : ViewModelCommon{
     public ICommand DeleteCommentCommand { get; set; }
     public ICommand ShowTextBoxCommand { get; set; }
 
+    private MessageBox _openDialogCommand ;
+    public MessageBox DialogCommand {
+        get => _openDialogCommand;
+        set => SetProperty(ref _openDialogCommand, value);
+    }
 
     private string _textToAdd;
 
@@ -78,7 +84,6 @@ internal class PollChoicesViewModel : ViewModelCommon{
         }
     }
     public void ShowTextBox() {
-
         AddComment = true;
         Console.WriteLine(AddComment + " Can write ? <--------");
     }
@@ -94,21 +99,19 @@ internal class PollChoicesViewModel : ViewModelCommon{
             var comment = new Comment(CurrentUser, Poll, TextToAdd, DateTime.Now);
             Context.Comments.Add(comment);
 
-            Context.SaveChanges();
             Commentaire.Add(comment);
             Poll.commentaires.Add(comment);
             TextToAdd = string.Empty;
+            AddComment = false;
+            Context.SaveChanges();
             refreshComm();
-
         }
         RaisePropertyChanged();
 
     }
 
     public void refreshComm() {
-        if (AddComment) {
-            AddComment = false;
-        }
+        
         Console.WriteLine(AddComment);
         foreach(var comm in Commentaire) {
             Console.WriteLine(comm.Text);
@@ -118,9 +121,7 @@ internal class PollChoicesViewModel : ViewModelCommon{
     // editAction et CanDoAction
 
 
-    public bool CanDoAction() {
-        return CurrentUser == Poll.Creator || CurrentUser.Role == Role.Administrator;
-    }
+    public bool CanDoAction =>  CurrentUser == Poll.Creator || CurrentUser.Role == Role.Administrator;
 
 
     public bool CanDeleteComment(Comment comment) {
@@ -130,10 +131,14 @@ internal class PollChoicesViewModel : ViewModelCommon{
 
     // DeleteAction
     private void DeleteAction() {
-        if (CanDoAction()) {
-            Poll.Delete();
-            NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
-            NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
+
+        if (CanDoAction) {
+            if(App.Confirm("Vous êtes sur le point de supprimer le poll '" + Poll.Name + "' cette action est irrévocable")) {
+                Poll.Delete();
+                NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+                NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
+            }
+           
         }
         //CancelAction();
     }
@@ -163,7 +168,7 @@ internal class PollChoicesViewModel : ViewModelCommon{
             PollDetailViewModel = new PollDetailView(poll, isNew);
             CanEditPoll = true;
         });
-        Delete = new RelayCommand(DeleteAction, CanDoAction);
+        Delete = new RelayCommand(DeleteAction);
         DeleteCommentCommand = new RelayCommand<Comment>(DeleteCommentAction);
         AddCommentCommand = new RelayCommand(AddCommentAction);
         ShowTextBoxCommand = new RelayCommand(ShowTextBox);

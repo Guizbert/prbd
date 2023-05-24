@@ -12,6 +12,11 @@ namespace MyPoll.ViewModel;
 
 internal class PollDetailViewModel : ViewModelCommon {
 
+
+    /* faire un notify colleague qui doit recevoir un choice quand on veut le delete 
+     et dans le constructeur mettre un register choice qui dit
+    'quand je recois le notify, je le remove de ma collection'
+    */
     public ICommand Save { get; set; }
     public ICommand Cancel { get; set; }
     public ICommand AddMyselfCommand { get; set; }
@@ -49,7 +54,9 @@ internal class PollDetailViewModel : ViewModelCommon {
         get => Poll.Name;
         set => SetProperty(Poll.Name, value, Poll, (t, v) => {
             t.Name = v;
-            NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+            //NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+            NotifyColleagues(App.Messages.MSG_POLL_NAMECHANGED, Poll);
+            //ajout validation
         });
     }
     private int _creatorId;
@@ -112,8 +119,6 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(ref _selectedChoice, value);
     }
 
-   
-
     private ObservableCollection<User> _participants;
 
     public ObservableCollection<User> UserParticipants {
@@ -132,6 +137,13 @@ internal class PollDetailViewModel : ViewModelCommon {
     public bool IsEditingChoice {
         get => _isEditingChoice;
         set => SetProperty(ref _isEditingChoice, value);
+    }
+
+    private bool _isNotEditingChoice;
+
+    public bool IsNotEditingChoice {
+        get => _isNotEditingChoice;
+        set => SetProperty(ref _isNotEditingChoice, value);
     }
 
 
@@ -187,14 +199,20 @@ internal class PollDetailViewModel : ViewModelCommon {
     {
         Poll = poll;
         IsNew = isNew;
+
+        IsNotEditingChoice = true;
+        IsEditingChoice = false;
         if(!IsNew) {
             UserParticipants = new ObservableCollection<User>(Poll.Participants.OrderBy(u => u.FullName));
             Choices = new ObservableCollection<Choice>(poll.Choices.OrderBy(c => c.Label));
+            SetNbVoteUser();
         } else {
-            IsClosed = Poll.Closed;
             UserParticipants = new ObservableCollection<User>();
+           
             Choices = new ObservableCollection<Choice>();
         }
+        IsClosed = Poll.Closed;
+        SelectedPollType = Poll.Type;
 
         Save = new RelayCommand(SaveAction, CanSaveAction);
         Cancel = new RelayCommand(CancelAction, CanCancelAction);
@@ -205,10 +223,10 @@ internal class PollDetailViewModel : ViewModelCommon {
         AddMyselfCommand = new RelayCommand(AddMyself);
         AddAllParticipantsCommand = new RelayCommand(AddAll);
 
-        DeleteParticipantCommand = new RelayCommand(DeleteParticipant, () => SelectedUserToDelete != null);
+        DeleteParticipantCommand = new RelayCommand<int>(DeleteParticipant);
 
         
-        DeleteChoiceCommand = new RelayCommand(DeleteChoice, () => SelectedChoice != null);
+        DeleteChoiceCommand = new RelayCommand<int>(DeleteChoice);
         UpdateChoiceCommand = new RelayCommand(UpdateChoice);
 
         RaisePropertyChanged();
@@ -220,6 +238,7 @@ internal class PollDetailViewModel : ViewModelCommon {
     public void refreshList() {
         //Poll.Participants = Participants;
         //UserParticipants.OrderBy(u => u.FullName);
+
         RaisePropertyChanged(nameof(UserParticipants));
         RaisePropertyChanged(nameof(Choices));
     }
@@ -237,18 +256,42 @@ internal class PollDetailViewModel : ViewModelCommon {
         }
         RaisePropertyChanged(nameof(UserParticipants));
     }
-    private void DeleteParticipant() {
-        UserParticipants.Remove(SelectedUserToDelete); // remove l'utilisateur sélectionné de la liste des participants
+    private void DeleteParticipant(int userid) {
+        var user = Poll.Participants.FirstOrDefault(u => u.Id == userid);
+        if(user.NbVote > 0 ) {
+            if(App.Confirm("you're about to delete the user " + user.FullName + " but he already voted in your poll. Are you sure?"))
+                UserParticipants.Remove(user); // remove l'utilisateur sélectionné de la liste des participants
+        } else {
+            UserParticipants.Remove(user); 
+        }
         refreshList();
     }
 
-    private void UpdateChoice() { // TODO
+    private void UpdateChoice() {                               // <------ TODO  ------>
+        IsNotEditingChoice = false;
         IsEditingChoice = true;
         Console.WriteLine(IsEditingChoice + " <- yeah");
     }
-    private void DeleteChoice() {
-        Choices.Remove(SelectedChoice);
+    private void DeleteChoice(int choiceId) {
+        var choiceToDelete = Poll.Choices.FirstOrDefault(c => c.Id == choiceId);
+        if(choiceToDelete.Votes.Count > 0) {
+            if(App.Confirm("You're about to delete the choice " + choiceToDelete.Label + " But it already got some votes. Are you sure ?")) {
+                Choices.Remove(choiceToDelete);
+            }
+        } else {
+            Choices.Remove(choiceToDelete);
+        }
         refreshList();
+
+    }
+
+    public void SetNbVoteUser(User u) {
+        u.NbVote = Choices.Sum(c => c.Votes.Count(v => v.UserId == u.Id));
+    }
+    public void SetNbVoteUser() {
+       foreach(var u in UserParticipants) {
+            SetNbVoteUser(u);
+        }
     }
 
     public override void SaveAction()
@@ -263,53 +306,44 @@ internal class PollDetailViewModel : ViewModelCommon {
             Poll = newPoll; // pour récup l'id
             newPoll.Participants = UserParticipants;
             newPoll.Choices = Choices;
-
-            NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
             IsNew = false;
         } else {
-            Poll.Participants = UserParticipants;
-            Poll.Choices = Choices;
-            Poll.Closed = IsClosed;
+            //Poll.Participants = UserParticipants;
+            //Poll.Choices = Choices;
+            //Poll.Closed = IsClosed;
             Context.Update(Poll);
         }
 
         Context.SaveChanges();
 
         NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
-
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
-//        NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
-
+        NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
     }
-
-
-    //private void UpdateChoice() {
-
-    //}
 
     private bool CanSaveAction() {
         if (IsNew) {
             return
                 !string.IsNullOrEmpty(Title) ;
         }
-        return IsClosed != Poll.Closed ||  (Poll != null &&
-            Poll.IsModified ||
-            Poll.Participants != null ||
-            Poll.Participants.Any() ||
-            Poll.Choices != null ||
-            Poll.Choices.Any());
+        return ( Poll.Name != null && 
+            Poll.IsModified && (
+            Poll.Participants != null &&
+            Poll.Participants != UserParticipants) ||
+            (Poll.Choices != null &&
+            Poll.Choices != Choices));
     }
 
     public override void CancelAction() {
         if (IsNew) {
             IsNew = false;
-            NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
         } else {
             Poll.Reload();
             RaisePropertyChanged();
         }
+        NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
-
+        NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
     }
 
     private bool CanCancelAction() {
@@ -321,3 +355,15 @@ internal class PollDetailViewModel : ViewModelCommon {
     }
 }
 
+/*
+ 
+ -> change vote fonctionne pas comprends pas pk
+
+
+-> est ce que j'ai bien fait la récup des nbVote user / choice aussi par la même occasion
+
+-> arrive pas a passer le textBox du comment en invisible
+
+
+
+ */

@@ -16,6 +16,8 @@ public partial class App : ApplicationBase<User, MyPollContext > {
         MSG_DELETE_POLL,            // supprimer poll
         MSG_UPDATE_POLL,            // mettre à jour poll
         MSG_EDIT_POLL,              // pour aller sur la page edit de poll
+        MSG_CLOSE_TABPOLLCREATED,
+        MSG_POLL_NAMECHANGED,
 
         MSG_CREATE_COMMENT,         // création commentaire
         MSG_DELETE_COMMENT,         // supprimer commentaire
@@ -26,8 +28,8 @@ public partial class App : ApplicationBase<User, MyPollContext > {
         MSG_DELETE_VOTE,
         MSG_UPDATE_VOTE,
 
-        MSG_CLOSE_TAB,
         MSG_LOGIN,
+        MSG_CLOSE_TAB,
         MSG_LOGOUT,
         MSG_REFRESH_DATA
     }

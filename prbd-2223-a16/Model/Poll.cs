@@ -30,15 +30,10 @@ public class Poll : EntityBase<MyPollContext> {
 
     public virtual User Creator { get; set; }
     public bool Closed { get; set; }
+    public virtual ICollection<User> Participants { get; set; } = new HashSet<User>();
+    public virtual ICollection<Choice> Choices { get; set; } = new HashSet<Choice>();
 
-    //public string BestChoice => getBestChoice(this);
-
-    //public static IEnumerable<User> UserNotParticipating => UsersNotParticipating;
-
-    public virtual ICollection<User> Participants { get; set; }
-    public virtual ICollection<Choice> Choices { get; set; }
-
-    public virtual ICollection<Comment> commentaires { get; set; }
+    public virtual ICollection<Comment> commentaires { get; set; } = new HashSet<Comment>();
 
     public Poll( int id, string name, int creatorId, PollType type) {
         Id = id;
@@ -89,6 +84,7 @@ public class Poll : EntityBase<MyPollContext> {
           return Context.Users.OrderBy(u => u.FullName).ToList();
         }
     }
+
     public bool HasVoted(User currentUser) {
         return Choices.Any(c => c.CheckUserVotedOnce(currentUser));
     }
@@ -98,6 +94,7 @@ public class Poll : EntityBase<MyPollContext> {
             return Choices.Sum(choice => choice.Votes.Count);
         }
     }
+
     public int GetMaxVotePossible() {
         if (Type == PollType.Single) {
             return 1; 
@@ -106,12 +103,13 @@ public class Poll : EntityBase<MyPollContext> {
         
     }
     public static IQueryable<Poll> GetPolls(User CurrentUser) {
-
-        if (CurrentUser.Role == Role.Administrator) {
+        if (CurrentUser.Role == Role.Administrator)
+        {
             var allPollsAdmin = (Context.Polls
                 .OrderBy(p => p.Name));
             return allPollsAdmin;
-        } else {
+        } else
+        {
             var allPolls = (Context.Polls
             .Where(poll => poll.Creator.Email.Contains(CurrentUser.Email) ||
                     poll.Participants.Contains(CurrentUser))
@@ -119,28 +117,23 @@ public class Poll : EntityBase<MyPollContext> {
             return allPolls;
         }
     }
-
-
     public static PollType[] getTypes() {
         return Enum.GetValues(typeof(PollType)).Cast<PollType>().ToArray();
-
     }
-    //public static PollType[] getTypes() =>
-    //    Enum.GetValues(typeof(PollType)).Cast<PollType>().ToArray();
 
     public void Delete() {
         // doit delete les choix, vote, ?
+
         foreach(Choice c in Choices) {
             c.Votes.Clear();
         }
         Choices.Clear();
         Participants.Clear();
-        if(commentaires.Count > 0) {
-            commentaires.Clear();
-            
+        foreach(var c in commentaires) {
+            Context.Comments.Remove(c);
         }
+        
         Context.Polls.Remove(this);
         Context.SaveChanges();
     }
 }
-

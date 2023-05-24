@@ -38,15 +38,12 @@ public class User : EntityBase<MyPollContext> {
 
     public bool isAdmin() { return this.Role == Role.Administrator; }
 
-    /**
-     *  TODO :
-     *  
-     *      -> creer un commentaire ;
-     *      -> faire un vote ;
-     *      -> faire un choix ;
-     *      -> créer sondage ;
-     */
+    [NotMapped]
+    public int NbVote { get; set; }
 
+    //public double VoteCountInPoll(Poll poll) {
+    //    return Votes.Where(vote => vote.Choice.Poll == poll && vote.User == this).Sum(vote => vote.Value);
+    //}
 
     public static User GetByEmail(string mail) {
         return Context.Users.SingleOrDefault(u => u.Email== mail);

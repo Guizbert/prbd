@@ -13,7 +13,7 @@ public class UserChoiceVoteViewModel : ViewModelCommon
 
     public UserChoiceVoteViewModel(User user, Choice choice, Poll poll) {
         Poll = poll;
-        UserVoted = user.Votes.Any(v => v.Choice.Id == choice.Id);
+        UserVoted = user.Votes.Any(v => v.Choice.Id == choice.Id);        
         UserVotedForCurrentPoll = user.Votes.Any(v => v.Choice.Poll == poll);
         _user = user;
         /* on doit récup a la creation de la vue les choix des users (si existant)*/
@@ -52,7 +52,7 @@ public class UserChoiceVoteViewModel : ViewModelCommon
     }
 
     public Poll Poll { get; set; }
-    public Vote Vote { get; private set; }
+    public Vote Vote { get;  set; }
     public UserChoiceVoteViewModel() { }
 
 

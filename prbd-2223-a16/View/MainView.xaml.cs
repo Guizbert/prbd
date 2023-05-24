@@ -22,6 +22,12 @@ public partial class MainView : WindowBase {
         Register<Poll>(App.Messages.MSG_CLOSE_TAB,              // si on veut faire des votes, etc
             poll => DoCloseTab(poll));
 
+        Register<Poll>(App.Messages.MSG_CLOSE_TABPOLLCREATED,
+            poll => DoCloseTab(null));
+
+
+        Register<Poll>(App.Messages.MSG_POLL_NAMECHANGED,
+         Poll => DoRenameTab(string.IsNullOrEmpty(Poll.Name) ? "<New Poll>" : Poll.Name));
 
     }
 
@@ -55,7 +61,10 @@ public partial class MainView : WindowBase {
     }
 
     private void DoCloseTab(Poll poll) {
-        tabControl.CloseByTag(string.IsNullOrEmpty(poll.Name) ? "<New Poll>" : poll.Name);
+        if(poll == null) {
+            tabControl.CloseByTag("<New Poll>");
+        }else
+            tabControl.CloseByTag(poll.Name);
     }
 
 }

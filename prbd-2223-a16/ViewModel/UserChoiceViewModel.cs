@@ -78,24 +78,38 @@ public class UserChoiceViewModel : ViewModelCommon
     }
 
     private void RefreshVote() {
-        // VoteVM est la liste qui servira de source pour la balise <ItemsControl>
         VoteVM = _choices
             .Select(c => new UserChoiceVoteViewModel(User, c, Poll))        // mettre la vue avec les choix
             .ToList();
+        // faire une fonction en db en utilisant la db
+    }
+
+    private void RefreshVoteDb() {
+        VoteVM = Context.Votes
+            .Where(v => v.User == User && v.Choice.Poll == Poll)
+            .Select(v => new UserChoiceVoteViewModel(User, v.Choice , Poll))
+            .ToList();
+    
+        // faire une fonction en db en utilisant la db
     }
     private void Save() {
         EditMode = false;
         //User.Votes = VoteVM.Where(u => u.Vote.Type != VoteType.Empty).Select(u => u.Vote).ToList();     // doit le faire sur les differents votes // <- pas bon ça récup tous les votes
         Context.SaveChanges();
         // On recrée la liste avec les nouvelles données
-        RefreshVote();
+        OnRefreshData();
     }
 
     private void Cancel() {
         EditMode = false;
         // On recrée la liste avec les nouvelles données
+
+        App.ClearContext();
+
+        NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
+
         
-        RefreshVote();
+        OnRefreshData();
     }
 
     private void Delete() {
@@ -113,7 +127,13 @@ public class UserChoiceViewModel : ViewModelCommon
         VoteVM.Clear(); 
         Context.SaveChanges();
         // On recrée la liste avec les nouvelles données
-        RefreshVote();
+        OnRefreshData();
+
+    }
+
+    protected override void OnRefreshData() {
+        //RaisePropertyChanged(nameof(VoteVM));
+        RefreshVoteDb();
     }
 }
 

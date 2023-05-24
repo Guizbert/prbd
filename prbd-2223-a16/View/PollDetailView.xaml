@@ -7,9 +7,11 @@
                 xmlns:fap="http://schemas.fontawesome.com/icons/fonts/properties"
                 xmlns:f="clr-namespace:PRBD_Framework;assembly=PRBD_Framework"
                 xmlns:vm="clr-namespace:MyPoll.ViewModel"
+                xmlns:vw="clr-namespace:MyPoll.View"
                 d:DataContext="{d:DesignInstance Type=vm:PollDetailViewModel}"
                 mc:Ignorable="d"
                 d:DesignHeight="450" d:DesignWidth="800">
+    
     <Grid>
         <Grid.RowDefinitions >
             <RowDefinition Height="auto"/>
@@ -23,6 +25,7 @@
             <TextBlock Text="{Binding Creator}" Margin="480,0,96,0" />
 
         </Grid>
+        
         <Grid Grid.Row="1" Background="AliceBlue">
             <StackPanel  Orientation="Vertical" Margin="0,10,0,225">
                 <StackPanel Orientation="Horizontal" Height="36" Margin="0,10,0,0">
@@ -54,11 +57,11 @@
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="{Binding FullName}" TextTrimming="CharacterEllipsis" />
-                                    
+                                    <TextBlock Text="{Binding Path=NbVote, StringFormat=' ({0})'}"></TextBlock>
                                     <Button fap:FontAwesome.Icon="Regular_TrashCan" Foreground="red"  Background="Transparent" BorderBrush="Transparent"
                                         Width="20" FontSize="15" Margin="10,0,0,0" Padding="2"
                                         Command="{Binding DataContext.DeleteParticipantCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
-                                            CommandParameter="{Binding}"  /> 
+                                            CommandParameter="{Binding Id}"  /> 
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -79,16 +82,10 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <StackPanel.Style>      <!--c'est censé faire la textBox?-->
-                                        <Style TargetType="StackPanel">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding DataContext.IsEditingChoice}" Value="True">
-                                                    <Setter Property="Visibility" Value="Collapsed" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </StackPanel.Style>
-                                    <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis"/>
+                                   
+                                    <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" Visibility="{Binding DataContext.IsNotEditingChoice, Converter={f:BoolToVisibleConverter}, RelativeSource={RelativeSource AncestorType={x:Type vw:PollDetailView}}}"/>
+                                    <TextBox Text="{Binding Label}"  Visibility="{Binding DataContext.IsEditingChoice, Converter={f:BoolToVisibleConverter}, RelativeSource={RelativeSource AncestorType={x:Type vw:PollDetailView}}}"/>
+                                    <TextBlock Text="{Binding Votes.Count, StringFormat=' ({0})'}" TextTrimming="CharacterEllipsis"/>
                                     
                                     <!--btn edit-->
                                     <Button fap:FontAwesome.Icon="Regular_PenToSquare" Foreground="DodgerBlue" Width="20"
@@ -102,7 +99,7 @@
                                         FontSize="15" Margin="10, 0 ,0 ,0"
                                         Padding="2" Background="Transparent" BorderBrush="Transparent" VerticalAlignment="Center" HorizontalAlignment="Center"
                                         Command="{Binding DataContext.DeleteChoiceCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
-                                            CommandParameter="{Binding}"  />
+                                            CommandParameter="{Binding Id}"  />
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -123,10 +120,6 @@
             <WrapPanel   HorizontalAlignment="Left"  Width="130" Margin="633,0,0,0">
                 <Button x:Name="btnCancel" Content="Cancel" Command="{Binding Cancel}" Width="auto" Padding="5,1" IsCancel="True"/>
                 <Button x:Name="btnSave" Content="Save" Command="{Binding Save}" Width="auto" Margin="10,0,0,0" Padding="5,1" IsDefault="True"/>
-                <!--<Button x:Name="btnDelete" Content="Delete" Command="{Binding Delete}" Width="auto" Margin="10,0,0,0" Padding="5,1"/>-->
-                <!-- Faire add button et edit button -->
-                <!--<Button Content="Add" Command="{Binding AddChoiceCommand}" Margin="0,0,10,0" Grid.ColumnSpan="2" Width="50"/>
-                <Button Content="Cancel" Command="{Binding AddChoiceCommand}" Margin="0,0,110,0" Grid.ColumnSpan="2" Width="50"/>-->
             </WrapPanel>
         </StackPanel>
     </Grid>
