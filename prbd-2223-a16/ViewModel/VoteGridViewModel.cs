@@ -23,7 +23,6 @@ public class VoteGridViewModel : ViewModelCommon
         var participants = poll.Participants.OrderBy(p => p.FullName).ToList();
 
         _userVm = participants.Select(s => new UserChoiceViewModel(this, s, _choices)).ToList();
-
     }
     public VoteGridViewModel()
     {
@@ -48,5 +47,11 @@ public class VoteGridViewModel : ViewModelCommon
         // (voir la logique dans UserChoiceViewModel)
         foreach (var u in UserVm)
             u.Changes();
+    }
+
+    public void Cancel() {
+        App.ClearContext();
+        NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
+
     }
 }

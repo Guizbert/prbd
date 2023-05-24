@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Microsoft.EntityFrameworkCore;
 using MyPoll.Model;
 using PRBD_Framework;
 
@@ -86,10 +87,10 @@ public class UserChoiceViewModel : ViewModelCommon
 
     private void RefreshVoteDb() {
         VoteVM = Context.Votes
-            .Where(v => v.User == User && v.Choice.Poll == Poll)
-            .Select(v => new UserChoiceVoteViewModel(User, v.Choice , Poll))
+            .Where(v => v.User == User && v.Choice.Poll == Poll )
+            .Select(v => new UserChoiceVoteViewModel(User, v.Choice, Poll))
             .ToList();
-    
+
         // faire une fonction en db en utilisant la db
     }
     private void Save() {
@@ -101,15 +102,25 @@ public class UserChoiceViewModel : ViewModelCommon
     }
 
     private void Cancel() {
+        //https://stackoverflow.com/questions/5466677/undo-changes-in-entity-framework-entities
+        foreach (var entry in Context.ChangeTracker.Entries()) {
+            switch (entry.State) {
+                case EntityState.Modified:
+                    entry.CurrentValues.SetValues(entry.OriginalValues);
+                    entry.State = EntityState.Unchanged;
+                    break;
+                case EntityState.Added:
+                    entry.State = EntityState.Detached;
+                    break;
+                case EntityState.Deleted:
+                    entry.State = EntityState.Unchanged;
+                    break;
+            }
+        }
         EditMode = false;
+        Dispose();
         // On recrée la liste avec les nouvelles données
-
-        App.ClearContext();
-
-        NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
-
-        
-        OnRefreshData();
+        RefreshVote();
     }
 
     private void Delete() {
@@ -133,7 +144,7 @@ public class UserChoiceViewModel : ViewModelCommon
 
     protected override void OnRefreshData() {
         //RaisePropertyChanged(nameof(VoteVM));
-        RefreshVoteDb();
+        RefreshVote();
     }
 }
 
