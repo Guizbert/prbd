@@ -5,6 +5,8 @@
                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                 xmlns:fa="http://schemas.fontawesome.com/icons/fonts"
                 xmlns:fap="http://schemas.fontawesome.com/icons/fonts/properties"
+                                xmlns:c="clr-namespace:CalcBinding;assembly=CalcBinding"
+
                 xmlns:f="clr-namespace:PRBD_Framework;assembly=PRBD_Framework"
                 xmlns:vm="clr-namespace:MyPoll.ViewModel"
                 xmlns:vw="clr-namespace:MyPoll.View"
@@ -78,30 +80,38 @@
                 <StackPanel Margin="30,0,0,0" Width="343">
                     <Label FontWeight="Bold" FontSize="15" Content="Choix" Height="37"/>
                     <ListBox ItemsSource="{Binding Choices}" Height="90" SelectionMode="Single" Name="lstChoice"
-                                 SelectedItem="{Binding SelectedChoice}">
+                            SelectedItem="{Binding SelectedChoice}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                   
-                                    <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" Visibility="{Binding DataContext.IsNotEditingChoice, Converter={f:BoolToVisibleConverter}, RelativeSource={RelativeSource AncestorType={x:Type vw:PollDetailView}}}"/>
-                                    <TextBox Text="{Binding Label}"  Visibility="{Binding DataContext.IsEditingChoice, Converter={f:BoolToVisibleConverter}, RelativeSource={RelativeSource AncestorType={x:Type vw:PollDetailView}}}"/>
-                                    <TextBlock Text="{Binding Votes.Count, StringFormat=' ({0})'}" TextTrimming="CharacterEllipsis"/>
-                                    
+
+                                    <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" Visibility="{c:Binding !EditMode}"/>
+                                    <TextBox Text="{Binding Label}"  Visibility="{c:Binding EditMode}"/>
+                                    <TextBlock Text="{Binding Choice.Votes.Count, StringFormat=' ({0})'}" TextTrimming="CharacterEllipsis"/>
+
+                                    <StackPanel>
+                                        <vw:ChoiceButtonView/>
+                                    </StackPanel>
+
+
                                     <!--btn edit-->
-                                    <Button fap:FontAwesome.Icon="Regular_PenToSquare" Foreground="DodgerBlue" Width="20"
+
+                                    <!--<Button fap:FontAwesome.Icon="Regular_PenToSquare" Foreground="DodgerBlue" Width="20"
                                         FontSize="15" Margin="10, 0 ,0 ,0"
                                         Padding="2" Background="Transparent" BorderBrush="Transparent" VerticalAlignment="Center" HorizontalAlignment="Center"
                                         Command="{Binding DataContext.UpdateChoiceCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
                                         CommandParameter="{Binding}"  />
 
-                                    <!--btn delete-->
+
+                                    --><!--btn delete--><!--
                                     <Button fap:FontAwesome.Icon="Regular_TrashCan" Foreground="red" Width="20"
                                         FontSize="15" Margin="10, 0 ,0 ,0"
                                         Padding="2" Background="Transparent" BorderBrush="Transparent" VerticalAlignment="Center" HorizontalAlignment="Center"
                                         Command="{Binding DataContext.DeleteChoiceCommand, RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}"
-                                            CommandParameter="{Binding Id}"  />
+                                            CommandParameter="{Binding Id}"  />-->
                                 </StackPanel>
                             </DataTemplate>
+
                         </ListBox.ItemTemplate>
                     </ListBox>
 
@@ -110,6 +120,8 @@
                         <Button Content="Add" Command="{Binding AddChoiceCommand}" Margin="10,0,0,0" Width="55"/>
                     </StackPanel>
                 </StackPanel>
+
+
             </StackPanel>
 
 

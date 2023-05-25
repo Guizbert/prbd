@@ -25,6 +25,7 @@ public class UserChoiceVoteViewModel : ViewModelCommon
             if (maxVote == 1) {
                 if (UserVotedForCurrentPoll) {
                     return; // Si le nombre maximum de votes est 1 et le vote est déjà effectué par l'utilisateur, ne rien faire.
+                    //p'tetre faire un notify colleague pour delete les votes
                 }
             }
             if (CurrentUser.Id == user.Id || CurrentUser.Role == Role.Administrator && !UserVotedForCurrentPoll) {

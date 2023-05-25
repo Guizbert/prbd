@@ -28,6 +28,7 @@ public class UserChoiceViewModel : ViewModelCommon
     }
 
     public Poll Poll { get; set ; }
+
     private VoteGridViewModel _voteGridViewModel;
     public ICommand EditCommand { get; }
     public ICommand SaveCommand { get; }
@@ -103,6 +104,7 @@ public class UserChoiceViewModel : ViewModelCommon
 
     private void Cancel() {
         //https://stackoverflow.com/questions/5466677/undo-changes-in-entity-framework-entities
+
         foreach (var entry in Context.ChangeTracker.Entries()) {
             switch (entry.State) {
                 case EntityState.Modified:
@@ -119,7 +121,6 @@ public class UserChoiceViewModel : ViewModelCommon
         }
         EditMode = false;
         Dispose();
-        // On recrée la liste avec les nouvelles données
         RefreshVote();
     }
 
@@ -137,13 +138,11 @@ public class UserChoiceViewModel : ViewModelCommon
 
         VoteVM.Clear(); 
         Context.SaveChanges();
-        // On recrée la liste avec les nouvelles données
         OnRefreshData();
 
     }
 
     protected override void OnRefreshData() {
-        //RaisePropertyChanged(nameof(VoteVM));
         RefreshVote();
     }
 }

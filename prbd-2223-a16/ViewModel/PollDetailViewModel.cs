@@ -4,8 +4,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
 using MyPoll.Model;
+using MyPoll.View;
 using PRBD_Framework;
 
 namespace MyPoll.ViewModel;
@@ -39,6 +41,13 @@ internal class PollDetailViewModel : ViewModelCommon {
             }
         }
     }
+
+    private UserControl _choiceViewModel;
+    public UserControl ChoiceViewModel {
+        get => _choiceViewModel;
+        set => SetProperty(ref _choiceViewModel, value); 
+    }
+
 
     private Poll _poll;
     public Poll Poll {
@@ -112,9 +121,9 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(ref _selectedUserToDelete, value);
     }
 
-    private Choice _selectedChoice;
+    private ChoiceViewModel _selectedChoice;
 
-    public Choice SelectedChoice {
+    public ChoiceViewModel SelectedChoice {
         get => _selectedChoice;
         set => SetProperty(ref _selectedChoice, value);
     }
@@ -126,8 +135,8 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(ref _participants, value, () => AddParticipant());
     }
 
-    private ObservableCollection<Choice> _choices;
-    public ObservableCollection<Choice> Choices {
+    private ObservableCollection<ChoiceViewModel> _choices;
+    public ObservableCollection<ChoiceViewModel> Choices {
         get => _choices;
         set => SetProperty(ref _choices, value, () => AddChoice());
     }
@@ -164,10 +173,7 @@ internal class PollDetailViewModel : ViewModelCommon {
             UserParticipants.Add(SelectedUser); // Ajouter l'utilisateur sélectionné à la liste de participants
         } else {
             Console.WriteLine("peut pas l'ajouter");
-        }
-        Console.WriteLine("User Participants : ");
-        foreach (User u in UserParticipants) {
-            Console.WriteLine("   ----->  " + u.FullName);
+            //ajout message erreur?
         }
         refreshList();
     }
@@ -182,7 +188,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         }else {
             var newChoice = new Choice { Label = ChoiceLabel };
          
-            Choices.Add(newChoice);
+            Choices.Add(new ChoiceViewModel(newChoice));
 
             // Réinitialiser la valeur de la propriété ChoiceLabel
             ChoiceLabel = string.Empty;
@@ -204,12 +210,11 @@ internal class PollDetailViewModel : ViewModelCommon {
         IsEditingChoice = false;
         if(!IsNew) {
             UserParticipants = new ObservableCollection<User>(Poll.Participants.OrderBy(u => u.FullName));
-            Choices = new ObservableCollection<Choice>(poll.Choices.OrderBy(c => c.Label));
+            Choices = new ObservableCollection<ChoiceViewModel>(poll.Choices.OrderBy(c => c.Label).Select(c => new ChoiceViewModel(c)));
             SetNbVoteUser();
         } else {
             UserParticipants = new ObservableCollection<User>();
-           
-            Choices = new ObservableCollection<Choice>();
+            Choices = new ObservableCollection<ChoiceViewModel>();
         }
         IsClosed = Poll.Closed;
         SelectedPollType = Poll.Type;
@@ -226,7 +231,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         DeleteParticipantCommand = new RelayCommand<int>(DeleteParticipant);
 
         
-        DeleteChoiceCommand = new RelayCommand<int>(DeleteChoice);
+        //DeleteChoiceCommand = new RelayCommand<int>(DeleteChoice);
         UpdateChoiceCommand = new RelayCommand(UpdateChoice);
 
         RaisePropertyChanged();
@@ -272,21 +277,21 @@ internal class PollDetailViewModel : ViewModelCommon {
         IsEditingChoice = true;
         Console.WriteLine(IsEditingChoice + " <- yeah");
     }
-    private void DeleteChoice(int choiceId) {
-        var choiceToDelete = Poll.Choices.FirstOrDefault(c => c.Id == choiceId);
-        if(choiceToDelete.Votes.Count > 0) {
-            if(App.Confirm("You're about to delete the choice " + choiceToDelete.Label + " But it already got some votes. Are you sure ?")) {
-                Choices.Remove(choiceToDelete);
-            }
-        } else {
-            Choices.Remove(choiceToDelete);
-        }
-        refreshList();
+    //private void DeleteChoice(int choiceId) {
+    //    var choiceToDelete = Poll.Choices.FirstOrDefault(c => c.Id == choiceId);
+    //    if(choiceToDelete.Votes.Count > 0) {
+    //        if(App.Confirm("You're about to delete the choice " + choiceToDelete.Label + " But it already got some votes. Are you sure ?")) {
+    //            Choices.Remove(choiceToDelete);
+    //        }
+    //    } else {
+    //        Choices.Remove(choiceToDelete);
+    //    }
+    //    refreshList();
 
-    }
+    //}
 
     public void SetNbVoteUser(User u) {
-        u.NbVote = Choices.Sum(c => c.Votes.Count(v => v.UserId == u.Id));
+        u.NbVote = Choices.Sum(c => c.Choice.Votes.Count(v => v.UserId == u.Id));
     }
     public void SetNbVoteUser() {
        foreach(var u in UserParticipants) {
@@ -305,7 +310,7 @@ internal class PollDetailViewModel : ViewModelCommon {
             Context.Add(newPoll);
             Poll = newPoll; // pour récup l'id
             newPoll.Participants = UserParticipants;
-            newPoll.Choices = Choices;
+           // newPoll.Choices = Choices;
             IsNew = false;
         } else {
             //Poll.Participants = UserParticipants;
@@ -355,15 +360,3 @@ internal class PollDetailViewModel : ViewModelCommon {
     }
 }
 
-/*
- 
- -> change vote fonctionne pas comprends pas pk
-
-
--> est ce que j'ai bien fait la récup des nbVote user / choice aussi par la même occasion
-
--> arrive pas a passer le textBox du comment en invisible
-
-
-
- */

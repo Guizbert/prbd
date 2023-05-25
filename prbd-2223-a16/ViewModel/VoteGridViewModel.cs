@@ -52,6 +52,5 @@ public class VoteGridViewModel : ViewModelCommon
     public void Cancel() {
         App.ClearContext();
         NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
-
     }
 }

@@ -66,12 +66,6 @@ internal class PollChoicesViewModel : ViewModelCommon{
     public ICommand DeleteCommentCommand { get; set; }
     public ICommand ShowTextBoxCommand { get; set; }
 
-    private MessageBox _openDialogCommand ;
-    public MessageBox DialogCommand {
-        get => _openDialogCommand;
-        set => SetProperty(ref _openDialogCommand, value);
-    }
-
     private string _textToAdd;
 
     public string TextToAdd {
