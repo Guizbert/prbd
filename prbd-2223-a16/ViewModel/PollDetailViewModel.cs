@@ -42,8 +42,8 @@ internal class PollDetailViewModel : ViewModelCommon {
         }
     }
 
-    private UserControl _choiceViewModel;
-    public UserControl ChoiceViewModel {
+    private ObservableCollectionFast<ChoiceView> _choiceViewModel = new ObservableCollectionFast<ChoiceView>();
+    public ObservableCollectionFast<ChoiceView> ChoiceViewModel {
         get => _choiceViewModel;
         set => SetProperty(ref _choiceViewModel, value); 
     }
@@ -135,8 +135,8 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(ref _participants, value, () => AddParticipant());
     }
 
-    private ObservableCollection<ChoiceViewModel> _choices;
-    public ObservableCollection<ChoiceViewModel> Choices {
+    private ObservableCollectionFast<Choice> _choices;
+    public ObservableCollectionFast<Choice> Choices {
         get => _choices;
         set => SetProperty(ref _choices, value, () => AddChoice());
     }
@@ -188,7 +188,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         }else {
             var newChoice = new Choice { Label = ChoiceLabel };
          
-            Choices.Add(new ChoiceViewModel(newChoice));
+            Choices.Add(newChoice);
 
             // Réinitialiser la valeur de la propriété ChoiceLabel
             ChoiceLabel = string.Empty;
@@ -205,17 +205,16 @@ internal class PollDetailViewModel : ViewModelCommon {
     {
         Poll = poll;
         IsNew = isNew;
-
         IsNotEditingChoice = true;
         IsEditingChoice = false;
-        if(!IsNew) {
-            UserParticipants = new ObservableCollection<User>(Poll.Participants.OrderBy(u => u.FullName));
-            Choices = new ObservableCollection<ChoiceViewModel>(poll.Choices.OrderBy(c => c.Label).Select(c => new ChoiceViewModel(c)));
-            SetNbVoteUser();
-        } else {
-            UserParticipants = new ObservableCollection<User>();
-            Choices = new ObservableCollection<ChoiceViewModel>();
-        }
+        UserParticipants = new ObservableCollectionFast<User>(Poll.Participants.OrderBy(u => u.FullName));
+        Choices = new ObservableCollectionFast<Choice>(poll.Choices.OrderBy(c => c.Label));
+        SetNbVoteUser();
+
+
+        var listChoice = new ChoiceView(Poll);
+        ChoiceViewModel.Add(listChoice);
+
         IsClosed = Poll.Closed;
         SelectedPollType = Poll.Type;
 
@@ -277,6 +276,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         IsEditingChoice = true;
         Console.WriteLine(IsEditingChoice + " <- yeah");
     }
+
     //private void DeleteChoice(int choiceId) {
     //    var choiceToDelete = Poll.Choices.FirstOrDefault(c => c.Id == choiceId);
     //    if(choiceToDelete.Votes.Count > 0) {
@@ -291,7 +291,7 @@ internal class PollDetailViewModel : ViewModelCommon {
     //}
 
     public void SetNbVoteUser(User u) {
-        u.NbVote = Choices.Sum(c => c.Choice.Votes.Count(v => v.UserId == u.Id));
+        u.NbVote = Choices.Sum(c => c.Votes.Count(v => v.UserId == u.Id));
     }
     public void SetNbVoteUser() {
        foreach(var u in UserParticipants) {
@@ -344,6 +344,8 @@ internal class PollDetailViewModel : ViewModelCommon {
             IsNew = false;
         } else {
             Poll.Reload();
+            Poll.Choices = Choices;
+            Poll.Participants = UserParticipants;
             RaisePropertyChanged();
         }
         NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);

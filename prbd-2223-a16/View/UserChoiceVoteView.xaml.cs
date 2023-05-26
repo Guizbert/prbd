@@ -12,13 +12,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using PRBD_Framework;
 namespace MyPoll.View
 {
     /// <summary>
     /// Logique d'interaction pour UserChoiceVoteView.xaml
     /// </summary>
-    public partial class UserChoiceVoteView : UserControl
+    public partial class UserChoiceVoteView : UserControlBase
     {
         public UserChoiceVoteView()
         {

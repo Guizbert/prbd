@@ -1,43 +1,48 @@
 ﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using Microsoft.EntityFrameworkCore;
 using MyPoll.Model;
 using PRBD_Framework;
 
 namespace MyPoll.ViewModel;
+public class ChoiceListViewModel : ViewModelCommon {
 
-public class ChoiceButtonViewModel : ViewModelCommon {
-
-    public ChoiceButtonViewModel(ChoiceViewModel choicevm, Choice choice) {
-        _choice = choice;
-        Poll = choice.Poll;
-        User = choice.Poll.Creator;
-
-        RefreshChoice();
-
-        Console.WriteLine("CREATION DE BTN VM");
-        EditCommand = new RelayCommand(() => EditMode = true);
-        SaveCommand = new RelayCommand(Save);
-        CancelCommand = new RelayCommand(Cancel);
-        DeleteCommand = new RelayCommand(Delete);
-    }
-
-    public Poll Poll { get; set; }
     public ICommand EditCommand { get; }
     public ICommand SaveCommand { get; }
     public ICommand CancelCommand { get; }
     public ICommand DeleteCommand { get; }
 
-    private Choice _choice;
+    public event Action Changed;
 
-    public User User { get; }
+     public ChoiceListViewModel(Poll p, Choice c ,ChoiceViewModel choiceVm)
+     {
+        Poll = p;
+        _choice = c;
+        _choiceVM = choiceVm;
+
+        EditCommand = new RelayCommand(() => EditMode = true);
+        SaveCommand = new RelayCommand(Save);
+        CancelCommand = new RelayCommand(Cancel);
+        DeleteCommand = new RelayCommand(Delete);
+
+     }
+
+
+    public ChoiceListViewModel(){}
+
+    private Poll _poll;
+    public Poll Poll {
+        get => _poll;
+        set => SetProperty(ref _poll, value);
+    }
+
+    private Choice _choice;
+    public Choice Choice {
+        get => _choice;
+        set=> SetProperty(ref _choice, value);
+    }
 
     private bool _editMode;
-
-
     // La visbilité des boutons de sauvegarde et d'annulation sont bindés sur cette propriété
     public bool EditMode {
         get => _editMode;
@@ -47,10 +52,11 @@ public class ChoiceButtonViewModel : ViewModelCommon {
     private void EditModeChanged() {
         ChoiceVM.EditMode = _editMode;
 
-        Console.WriteLine(_editMode+ "sdpfodspfokspdofkpsodfk 123 123 123 123");
-        //_voteGridViewModel.AskEditMode(EditMode);
+        Console.WriteLine(_editMode + " < - - - - test EditModeChanged");
+
         ChoiceVM.AskEditMode(EditMode);
     }
+
 
     // Méthode appelée par le VM parent pour que la ligne mettre à jour la visibilité des boutons
     public void Changes() {
@@ -65,7 +71,6 @@ public class ChoiceButtonViewModel : ViewModelCommon {
 
     public bool ParentEditMode => _choiceVM.EditMode;
 
-
     private ChoiceViewModel _choiceVM = new();
     public ChoiceViewModel ChoiceVM {
         get => _choiceVM;
@@ -75,33 +80,41 @@ public class ChoiceButtonViewModel : ViewModelCommon {
     
 
     private void RefreshChoice() {
-        _choiceVM.Choice = _choice;
-
-        // faire une fonction en db en utilisant la db
+        //ChoiceVM = _choices
+        //    .Select(c => new UserChoiceVoteViewModel(User, c, Poll))        // mettre la vue avec les choix
+        //    .ToList();
     }
     private void Save() {
         EditMode = false;
-        //User.Votes = VoteVM.Where(u => u.Vote.Type != VoteType.Empty).Select(u => u.Vote).ToList();     // doit le faire sur les differents votes // <- pas bon ça récup tous les votes
-        Context.SaveChanges();
-        // On recrée la liste avec les nouvelles données
-        OnRefreshData();
+        var choice = Poll.Choices.FirstOrDefault(c => c.Label == Choice.Label);
+        if(Choice.Label != choice.Label) {
+            choice.Label = Choice.Label;
+            Context.SaveChanges();
+        }
     }
 
     private void Cancel() {
-        
+        //pas bon
+
         EditMode = false;
+        var choice = Poll.Choices.FirstOrDefault(c => c.Label == Choice.Label);
+        Choice.Label = choice.Label;
         Dispose();
-        // On recrée la liste avec les nouvelles données
-        RefreshChoice();
     }
 
     private void Delete() {
-        
+        Console.WriteLine(Choice.Label +" 1");
+
+        Poll.Choices.Remove(Choice);
+        Context.Choices.Remove(Choice);
+        _choiceVM.ChoicesVm.Remove(this);
+        Changed?.Invoke();
 
     }
 
     protected override void OnRefreshData() {
         RefreshChoice();
     }
+
 }
 

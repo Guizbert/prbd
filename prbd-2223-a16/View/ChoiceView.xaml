@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="MyPoll.View.ChoiceView"
+﻿<f:UserControlBase x:Class="MyPoll.View.ChoiceView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -11,27 +11,31 @@
              xmlns:m="clr-namespace:MyPoll.Model"
              xmlns:media="clr-namespace:System.Windows.Media;assembly=PresentationCore"
              xmlns:f="clr-namespace:PRBD_Framework;assembly=PRBD_Framework"
+             xmlns:fap="http://schemas.fontawesome.com/icons/fonts/properties"
              d:DesignHeight="250" d:DesignWidth="200"
              d:DataContext="{d:DesignInstance Type=vm:ChoiceViewModel, IsDesignTimeCreatable=True}"
              x:Name="uc">
-    
-    <Border  BorderBrush="Black" BorderThickness="1,0,0,1" SnapsToDevicePixels="True" Width="100" MinHeight="50">
-        <StackPanel VerticalAlignment="Center">
-
-            <!-- Affiche les boutons de choix lors de l'édition -->
-            <TextBlock Text="{Binding Label}" Visibility="{c:Binding !EditMode}"></TextBlock>
-
-            <!-- Affiche les boutons de choix lors de l'édition -->
-            <TextBox Text="{Binding Label}" Visibility="{c:Binding EditMode}"></TextBox>
-
-            
-            <ItemsControl ItemsSource="{Binding ChoiceVm}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <!-- Partie pour afficher les choices du poll -->
+        <Border Grid.Row="0">
+            <ItemsControl ItemsSource="{Binding ChoicesVm}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <vw:ChoiceButtonView/>
+                        <vw:ChoiceListView />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+        </Border>
+        <!-- Partie pour ajouter un nouveau choice -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,0">
+            <TextBox Text="{Binding ChoiceLabel}" Width="189" Height="50" />
+            <Button Content="Add" Command="{Binding AddChoiceCommand}" Margin="10,0,0,0" Width="55" Height="50" />
         </StackPanel>
-    </Border>
-</UserControl>
+    </Grid>
+
+
+</f:UserControlBase>

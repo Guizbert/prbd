@@ -18,6 +18,8 @@ public partial class App : ApplicationBase<User, MyPollContext > {
         MSG_EDIT_POLL,              // pour aller sur la page edit de poll
         MSG_CLOSE_TABPOLLCREATED,
         MSG_POLL_NAMECHANGED,
+        MSG_DELETE_CHOICE,
+        MSG_NEWCHOICE_POLLSINGLE,
 
         MSG_CREATE_COMMENT,         // création commentaire
         MSG_DELETE_COMMENT,         // supprimer commentaire

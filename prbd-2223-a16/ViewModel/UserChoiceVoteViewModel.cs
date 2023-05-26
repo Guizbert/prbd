@@ -22,13 +22,15 @@ public class UserChoiceVoteViewModel : ViewModelCommon
         // faire un boolean pour savoir si le user a voté?
         ChangeVote = new RelayCommand<VoteType>(voteType => {
             var maxVote = Poll.GetMaxVotePossible();
-            if (maxVote == 1) {
-                if (UserVotedForCurrentPoll) {
-                    return; // Si le nombre maximum de votes est 1 et le vote est déjà effectué par l'utilisateur, ne rien faire.
-                    //p'tetre faire un notify colleague pour delete les votes
-                }
-            }
+            var max = Poll.Type == PollType.Single ? 1 : 0;
+            
             if (CurrentUser.Id == user.Id || CurrentUser.Role == Role.Administrator && !UserVotedForCurrentPoll) {
+                if (max == 1) {
+                    if (UserVotedForCurrentPoll) {
+                        NotifyColleagues(App.Messages.MSG_NEWCHOICE_POLLSINGLE, voteType); // Si le nombre maximum de votes est 1 et le vote est déjà effectué par l'utilisateur, ne rien faire.
+                         //p'tetre faire un notify colleague pour delete les votes
+                    }
+                }
                 if (Vote.Type != VoteType.Empty && voteType != VoteType.Empty) {
                     Vote.Type = voteType;
                     Context.Update(Vote);

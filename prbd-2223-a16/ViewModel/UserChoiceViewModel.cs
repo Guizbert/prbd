@@ -25,6 +25,8 @@ public class UserChoiceViewModel : ViewModelCommon
         SaveCommand = new RelayCommand(Save);
         CancelCommand = new RelayCommand(Cancel);
         DeleteCommand = new RelayCommand(Delete);
+        Register<VoteType>(App.Messages.MSG_NEWCHOICE_POLLSINGLE, v => Clear());
+
     }
 
     public Poll Poll { get; set ; }
@@ -104,6 +106,7 @@ public class UserChoiceViewModel : ViewModelCommon
 
     private void Cancel() {
         //https://stackoverflow.com/questions/5466677/undo-changes-in-entity-framework-entities
+        Context.Entry(Votes).Reload();
 
         foreach (var entry in Context.ChangeTracker.Entries()) {
             switch (entry.State) {
@@ -131,14 +134,25 @@ public class UserChoiceViewModel : ViewModelCommon
         foreach (var vote in voteToDelete) {
             User.Votes.Remove(vote);
         }
-
         // Save the changes and refresh the voting choices
         Context.SaveChanges();
-
 
         VoteVM.Clear(); 
         Context.SaveChanges();
         OnRefreshData();
+
+    }
+    private void Clear() {
+        // Remove votes from the current poll
+        var currentChoicesId = _choices.Select(c => c.Id).ToList();
+        var voteToDelete = User.Votes.Where(v => currentChoicesId.Contains(v.Choice.Id)).ToList();
+        foreach (var vote in voteToDelete) {
+            User.Votes.Remove(vote);
+        }
+
+        VoteVM.Clear(); 
+        Context.SaveChanges();
+        //OnRefreshData();
 
     }
 

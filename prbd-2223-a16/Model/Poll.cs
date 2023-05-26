@@ -100,7 +100,6 @@ public class Poll : EntityBase<MyPollContext> {
             return 1; 
         }
         return Choices.Count;
-        
     }
     public static IQueryable<Poll> GetPolls(User CurrentUser) {
         if (CurrentUser.Role == Role.Administrator)

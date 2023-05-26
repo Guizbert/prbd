@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using MyPoll.Model;
 using PRBD_Framework;
+using static MyPoll.App;
 
 namespace MyPoll.ViewModel;
 public class ChoiceViewModel : ViewModelCommon {
@@ -14,30 +16,36 @@ public class ChoiceViewModel : ViewModelCommon {
         get => _poll;
         set => SetProperty(ref _poll, value);
     }
-    public ChoiceViewModel(Choice choice) {
-        _choice = choice;
 
-        Poll = choice.Poll;
+    public ICommand AddChoiceCommand { get; set; }
+    public ChoiceViewModel(Poll poll) {
+       // _choices = new ObservableCollectionFast<Choice>(poll.Choices.OrderBy(c => c.Label).ToList());
+        _choices = new ObservableCollectionFast<Choice>(poll.Choices.OrderBy(c => c.Label));
+        Poll = poll;
 
-        _choiceVm = new ChoiceButtonViewModel(this, choice);
+        _choicesVm = new ObservableCollectionFast<ChoiceListViewModel>(_choices.Select(c =>  new ChoiceListViewModel(poll, c, this)));
+        //_choicesVm = new ObservableCollectionFast<ChoiceListViewModel>(poll, c, this);
 
-        Console.WriteLine(_choiceVm);
+        AddChoiceCommand = new RelayCommand(AddChoice);
 
-        _label = choice.Label;
-        Console.WriteLine(EditMode);
-    }
-    private Choice _choice;
-    public Choice Choice {
-        get => _choice;
-        set => SetProperty(ref _choice, value);
     }
 
-    public ChoiceViewModel(){}
+    private string _choiceLabel;
+    public string ChoiceLabel {
+        get => _choiceLabel;
+        set=> SetProperty(ref _choiceLabel, value);
+    }
+    public ChoiceViewModel() { }
 
-    private string _label;
-    public string Label {
-        get => _label;
-        set => SetProperty(ref _label, value);
+
+    // choicesVm (va afficher les choices + boutons)
+    private ObservableCollectionFast<ChoiceListViewModel> _choicesVm;
+    public ObservableCollectionFast<ChoiceListViewModel> ChoicesVm => _choicesVm;  
+
+
+    private ObservableCollectionFast<Choice> _choices;
+    public ObservableCollectionFast<Choice> Choices {
+        get => _choices;
     }
 
     private bool _editMode;
@@ -46,23 +54,63 @@ public class ChoiceViewModel : ViewModelCommon {
         set => SetProperty(ref _editMode, value);
     }
 
-    private ChoiceButtonViewModel _choiceVm;
-    public ChoiceButtonViewModel ChoiceVm => _choiceVm;
-
     // Méthode appelée lorsqu'on veut éditer une ligne ou lorsqu'on a fini d'éditer une ligne
     public void AskEditMode(bool editMode) {
         EditMode = editMode;
 
         // Change la visibilité des boutons de chacune des lignes
         // (voir la logique dans UserChoiceViewModel)
-        ChoiceVm.Changes();
     }
+    public void AddChoice() {
+        // ajouter validation (if(!haserror)
+        var newChoice = new Choice { Label = ChoiceLabel };
+        // faire validation
+        Poll.Choices.Add(newChoice);
+        _choices.Add(newChoice);
+
+        //ajout event 
+        var AddToVm = new ChoiceListViewModel(Poll, newChoice, this);
+        AddToVm.Changed += () => {
+            Console.WriteLine("test changed event ");
+            ChoicesVm.Remove(AddToVm);
+        };
+        _choicesVm.Insert(0, AddToVm);
+        ChoiceLabel = "";
+        Context.Choices.Add(newChoice);
+        RaisePropertyChanged();
+        NotifyColleagues(App.Messages.MSG_UPDATE_COMMENT, Poll);
+        
+    }
+    public void EditChoice() {
+
+
+        // ajouter validation (if(!haserror)
+        var newChoice = new Choice { Label = ChoiceLabel };
+        // faire validation
+        Poll.Choices.Add(newChoice);
+        _choices.Add(newChoice);
+
+        //ajout event 
+        var AddToVm = new ChoiceListViewModel(Poll, newChoice, this);
+        AddToVm.Changed += () => {
+            Console.WriteLine("test");
+            ChoicesVm.Remove(AddToVm);
+        };
+        _choicesVm.Insert(0, AddToVm);
+        ChoiceLabel = "";
+        Context.Choices.Add(newChoice);
+        RaisePropertyChanged();
+        NotifyColleagues(App.Messages.MSG_UPDATE_COMMENT, Poll);
+        
+    }
+    
+
 
     public void Cancel() {
         App.ClearContext();
         NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
-
     }
+
 
 }
 
