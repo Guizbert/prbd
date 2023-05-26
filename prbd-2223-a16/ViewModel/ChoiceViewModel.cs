@@ -70,10 +70,7 @@ public class ChoiceViewModel : ViewModelCommon {
 
         //ajout event 
         var AddToVm = new ChoiceListViewModel(Poll, newChoice, this);
-        AddToVm.Changed += () => {
-            Console.WriteLine("test changed event ");
-            ChoicesVm.Remove(AddToVm);
-        };
+         
         _choicesVm.Insert(0, AddToVm);
         ChoiceLabel = "";
         Context.Choices.Add(newChoice);

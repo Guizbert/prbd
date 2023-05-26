@@ -21,15 +21,17 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <!-- Partie pour afficher les choices du poll -->
-        <Border Grid.Row="0">
-            <ItemsControl ItemsSource="{Binding ChoicesVm}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <vw:ChoiceListView />
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </Border>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Border Grid.Row="0">
+                <ItemsControl ItemsSource="{Binding ChoicesVm}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <vw:ChoiceListView />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+        </ScrollViewer>
         <!-- Partie pour ajouter un nouveau choice -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,0">
             <TextBox Text="{Binding ChoiceLabel}" Width="189" Height="50" />

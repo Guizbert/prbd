@@ -106,7 +106,7 @@ public class UserChoiceViewModel : ViewModelCommon
 
     private void Cancel() {
         //https://stackoverflow.com/questions/5466677/undo-changes-in-entity-framework-entities
-        Context.Entry(Votes).Reload();
+        //Context.Entry(Votes).Reload();
 
         foreach (var entry in Context.ChangeTracker.Entries()) {
             switch (entry.State) {
