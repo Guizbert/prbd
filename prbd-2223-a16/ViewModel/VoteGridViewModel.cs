@@ -21,6 +21,7 @@ public class VoteGridViewModel : ViewModelCommon
         _choices = poll.Choices.OrderBy(c => c.Label).ToList();
 
         var participants = poll.Participants.OrderBy(p => p.FullName).ToList();
+        _participants = participants;
 
         _userVm = participants.Select(s => new UserChoiceViewModel(this, s, _choices)).ToList();
     }
@@ -38,6 +39,9 @@ public class VoteGridViewModel : ViewModelCommon
     }
     private List<UserChoiceViewModel> _userVm;
     public List<UserChoiceViewModel> UserVm => _userVm;
+
+    private List<User> _participants;
+    public List<User> Participants => _participants;
 
     // Méthode appelée lorsqu'on veut éditer une ligne ou lorsqu'on a fini d'éditer une ligne
     public void AskEditMode(bool editMode) {

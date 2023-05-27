@@ -19,7 +19,7 @@ public class ChoiceListViewModel : ViewModelCommon {
         Poll = p;
         _choice = c;
         _choiceVM = choiceVm;
-
+        _label = c.Label;
         EditCommand = new RelayCommand(() => EditMode = true);
         SaveCommand = new RelayCommand(Save);
         CancelCommand = new RelayCommand(Cancel);
@@ -36,12 +36,17 @@ public class ChoiceListViewModel : ViewModelCommon {
         set => SetProperty(ref _poll, value);
     }
 
+    private string _label;
+    public string Label {
+        get => _label;
+        set => SetProperty(ref _label, value);
+    }
+
     private Choice _choice;
     public Choice Choice {
         get => _choice;
         set=> SetProperty(ref _choice, value);
     }
-
     private bool _editMode;
     // La visbilité des boutons de sauvegarde et d'annulation sont bindés sur cette propriété
     public bool EditMode {
@@ -89,6 +94,7 @@ public class ChoiceListViewModel : ViewModelCommon {
         var choice = Poll.Choices.FirstOrDefault(c => c.Label == Choice.Label);
         if(Choice.Label != choice.Label) {
             choice.Label = Choice.Label;
+            //Label = choice.Label;
             Context.SaveChanges();
         }
     }
@@ -96,20 +102,27 @@ public class ChoiceListViewModel : ViewModelCommon {
     private void Cancel() {
         //pas bon
 
+        var c = Context.Choices.FirstOrDefault(c => c.Id == Choice.Id);
+        _label = c.Label;
+
+        Console.WriteLine(Label +" teest ");
+
         EditMode = false;
-        var choice = Poll.Choices.FirstOrDefault(c => c.Label == Choice.Label);
-        Choice.Label = choice.Label;
-        Dispose();
+        Choice.Label = Label;
+        Choice.Reload();
+        Context.SaveChanges();
+
+        //Changed?.Invoke(); // déclenche l'event. le ? pour check si l'event est null
+
+        //Dispose();
     }
 
-    private void Delete() {
-        Console.WriteLine(Choice.Label +" 1");
-
+    private void Delete() {       
         Poll.Choices.Remove(Choice);
         Context.Choices.Remove(Choice);
         _choiceVM.ChoicesVm.Remove(this);
-        Changed?.Invoke();
 
+        Changed?.Invoke(); // déclenche l'event. le ? pour check si l'event est null
     }
 
     protected override void OnRefreshData() {

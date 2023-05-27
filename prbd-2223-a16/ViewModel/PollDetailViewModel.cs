@@ -42,8 +42,13 @@ internal class PollDetailViewModel : ViewModelCommon {
         }
     }
 
-    private ObservableCollectionFast<ChoiceView> _choiceViewModel = new ObservableCollectionFast<ChoiceView>();
-    public ObservableCollectionFast<ChoiceView> ChoiceViewModel {
+    private ObservableCollectionFast<ChoiceViewModel> _choiceViewModel = new ObservableCollectionFast<ChoiceViewModel>();
+
+    // Choice vm a la place de la view
+    //la vue sera faite automatiquement
+    //on aura directement accès au vm et on pourra appeler les choices
+
+    public ObservableCollectionFast<ChoiceViewModel> ChoiceViewModel {
         get => _choiceViewModel;
         set => SetProperty(ref _choiceViewModel, value); 
     }
@@ -121,12 +126,12 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(ref _selectedUserToDelete, value);
     }
 
-    private ChoiceViewModel _selectedChoice;
+    //private ChoiceViewModel _selectedChoice;
 
-    public ChoiceViewModel SelectedChoice {
-        get => _selectedChoice;
-        set => SetProperty(ref _selectedChoice, value);
-    }
+    //public ChoiceViewModel SelectedChoice {
+    //    get => _selectedChoice;
+    //    set => SetProperty(ref _selectedChoice, value);
+    //}
 
     private ObservableCollection<User> _participants;
 
@@ -212,7 +217,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         SetNbVoteUser();
 
 
-        var listChoice = new ChoiceView(Poll);
+        var listChoice = new ChoiceViewModel(Poll);
         ChoiceViewModel.Add(listChoice);
 
         IsClosed = Poll.Closed;
@@ -287,7 +292,6 @@ internal class PollDetailViewModel : ViewModelCommon {
     //        Choices.Remove(choiceToDelete);
     //    }
     //    refreshList();
-
     //}
 
     public void SetNbVoteUser(User u) {
@@ -302,6 +306,7 @@ internal class PollDetailViewModel : ViewModelCommon {
     public override void SaveAction()
     {
         if (IsNew) {
+
             var newPoll = new Poll(
                 Title = Title,
                 CreatorId = CreatorId,
@@ -310,12 +315,19 @@ internal class PollDetailViewModel : ViewModelCommon {
             Context.Add(newPoll);
             Poll = newPoll; // pour récup l'id
             newPoll.Participants = UserParticipants;
-           // newPoll.Choices = Choices;
+            foreach(var cvm in ChoiceViewModel)
+               Choices = cvm.Choices;
+
+            newPoll.Choices = Choices;
             IsNew = false;
         } else {
-            //Poll.Participants = UserParticipants;
-            //Poll.Choices = Choices;
-            //Poll.Closed = IsClosed;
+            foreach (var cvm in ChoiceViewModel) {
+                if(cvm.Choices.Count > 0)
+                    Choices = cvm.Choices;
+            }
+            Poll.Participants = UserParticipants;
+            Poll.Choices = Choices;
+            Poll.Closed = IsClosed;
             Context.Update(Poll);
         }
 
@@ -354,11 +366,12 @@ internal class PollDetailViewModel : ViewModelCommon {
     }
 
     private bool CanCancelAction() {
-        return Poll != null && (IsNew || Poll.IsModified ||
-            Poll.Participants != null ||
-            Poll.Participants.Any() ||
-            Poll.Choices != null ||
-            Poll.Choices.Any());
+        return Poll != null && (IsNew || Poll.IsModified ) ;
+        //return Poll != null && (IsNew || Poll.IsModified ||
+        //    Poll.Participants != null ||
+        //    Poll.Participants.Any() ||
+        //    Poll.Choices != null ||
+        //    Poll.Choices.Any());
     }
 }
 

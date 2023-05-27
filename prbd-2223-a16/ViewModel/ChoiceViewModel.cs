@@ -46,6 +46,7 @@ public class ChoiceViewModel : ViewModelCommon {
     private ObservableCollectionFast<Choice> _choices;
     public ObservableCollectionFast<Choice> Choices {
         get => _choices;
+        set => SetProperty(ref _choices, value);
     }
 
     private bool _editMode;
@@ -78,6 +79,7 @@ public class ChoiceViewModel : ViewModelCommon {
         NotifyColleagues(App.Messages.MSG_UPDATE_COMMENT, Poll);
         
     }
+
     public void EditChoice() {
 
 
@@ -89,10 +91,13 @@ public class ChoiceViewModel : ViewModelCommon {
 
         //ajout event 
         var AddToVm = new ChoiceListViewModel(Poll, newChoice, this);
+
+        // abonnement a l'event
         AddToVm.Changed += () => {
             Console.WriteLine("test");
             ChoicesVm.Remove(AddToVm);
         };
+
         _choicesVm.Insert(0, AddToVm);
         ChoiceLabel = "";
         Context.Choices.Add(newChoice);

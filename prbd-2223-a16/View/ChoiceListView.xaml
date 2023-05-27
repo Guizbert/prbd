@@ -10,39 +10,41 @@
              mc:Ignorable="d"
              d:DesignHeight="200" d:DesignWidth="200"
              x:Name="uc">
-
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0">
-            <TextBlock Text="{Binding Choice.Label}" TextTrimming="CharacterEllipsis" Visibility="{c:Binding !EditMode}" />
-            <TextBox Text="{Binding Choice.Label}" Visibility="{c:Binding EditMode}" />
-        </StackPanel>
-        <StackPanel Grid.Column="1">
-            <TextBlock Text="{Binding Choice.Votes.Count, StringFormat=' ({0})'}" TextTrimming="CharacterEllipsis" />
-        </StackPanel>
-        <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button fap:FontAwesome.Icon="Regular_PenToSquare" Foreground="DodgerBlue" Width="20" FontSize="15" Margin="0"
-                Padding="2" Background="Transparent" BorderBrush="Transparent"
-                Visibility="{c:Binding Editable}"
-                Command="{Binding EditCommand}" />
-            <Button fap:FontAwesome.Icon="Regular_TrashCan" Foreground="Red" Width="20" FontSize="15" Margin="0"
-                Padding="2" Background="Transparent" BorderBrush="Transparent"
-                Visibility="{c:Binding Editable}"
-                Command="{Binding DeleteCommand}" />
-            <Button fap:FontAwesome.Icon="Solid_FloppyDisk" Foreground="Green" Width="20" FontSize="15" Margin="0"
-                Padding="2" Background="Transparent" BorderBrush="Transparent"
-                Visibility="{c:Binding EditMode}"
-                Command="{Binding SaveCommand}" />
-            <Button fap:FontAwesome.Icon="Solid_X" Foreground="Red" Width="20" FontSize="15" Margin="0"
-                Padding="2" Background="Transparent" BorderBrush="Transparent"
-                Visibility="{c:Binding EditMode}"
-                Command="{Binding CancelCommand}" />
-        </StackPanel>
-    </Grid>
+    <Border >
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" Visibility="{c:Binding !EditMode}" />
+                    <TextBox Text="{Binding Choice.Label}" Visibility="{c:Binding EditMode}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="{Binding Choice.Votes.Count, StringFormat=' ({0})'}" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button fap:FontAwesome.Icon="Regular_PenToSquare" Foreground="DodgerBlue" Width="20" FontSize="15" Margin="0"
+                        Padding="2" Background="Transparent" BorderBrush="Transparent"
+                        Visibility="{c:Binding Editable}"
+                        Command="{Binding EditCommand}" />
+                    <Button fap:FontAwesome.Icon="Regular_TrashCan" Foreground="Red" Width="20" FontSize="15" Margin="0"
+                        Padding="2" Background="Transparent" BorderBrush="Transparent"
+                        Visibility="{c:Binding Editable}"
+                        Command="{Binding DeleteCommand}" />
+                    <Button fap:FontAwesome.Icon="Solid_FloppyDisk" Foreground="Green" Width="20" FontSize="15" Margin="0"
+                        Padding="2" Background="Transparent" BorderBrush="Transparent"
+                        Visibility="{c:Binding EditMode}"
+                        Command="{Binding SaveCommand}" />
+                    <Button fap:FontAwesome.Icon="Solid_X" Foreground="Red" Width="20" FontSize="15" Margin="0"
+                        Padding="2" Background="Transparent" BorderBrush="Transparent"
+                        Visibility="{c:Binding EditMode}"
+                        Command="{Binding CancelCommand}" />
+                </StackPanel>
+        </Grid>
+    </Border>
 
 
 </f:UserControlBase>

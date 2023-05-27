@@ -27,8 +27,14 @@ public class UserChoiceViewModel : ViewModelCommon
         DeleteCommand = new RelayCommand(Delete);
         Register<VoteType>(App.Messages.MSG_NEWCHOICE_POLLSINGLE, v => Clear());
 
-    }
 
+        /*
+                verif ici le mode single :
+                        -> rechercher dans le gridvm dans userVm rechercher le participant courant parcourir ses choix et changer ses votes et mettre a empty
+         */
+
+    }
+    
     public Poll Poll { get; set ; }
 
     private VoteGridViewModel _voteGridViewModel;
@@ -40,6 +46,8 @@ public class UserChoiceViewModel : ViewModelCommon
     private List<Choice> _choices;
 
     public User User { get; }
+
+    public VoteType Vote { get; set; }
 
     private bool _editMode;
 
@@ -149,7 +157,6 @@ public class UserChoiceViewModel : ViewModelCommon
         foreach (var vote in voteToDelete) {
             User.Votes.Remove(vote);
         }
-
         VoteVM.Clear(); 
         Context.SaveChanges();
         //OnRefreshData();

@@ -95,12 +95,6 @@ public class Poll : EntityBase<MyPollContext> {
         }
     }
 
-    public int GetMaxVotePossible() {
-        if (Type == PollType.Single) {
-            return 1; 
-        }
-        return Choices.Count;
-    }
     public static IQueryable<Poll> GetPolls(User CurrentUser) {
         if (CurrentUser.Role == Role.Administrator)
         {

@@ -13,21 +13,30 @@ public class UserChoiceVoteViewModel : ViewModelCommon
 
     public UserChoiceVoteViewModel(User user, Choice choice, Poll poll) {
         Poll = poll;
-        UserVoted = user.Votes.Any(v => v.Choice.Id == choice.Id);        
+
+        UserVoted = user.Votes.Any(v => v.Choice.Id == choice.Id);
+
         UserVotedForCurrentPoll = user.Votes.Any(v => v.Choice.Poll == poll);
+
         _user = user;
+
+        Choice = choice;
+
         /* on doit récup a la creation de la vue les choix des users (si existant)*/
         Vote = user.Votes.FirstOrDefault(v =>v.Choice.Id == choice.Id)??new Vote() {Choice = choice, User = user, Type = VoteType.Empty };
-        Console.WriteLine(Vote.Type + " LE VOTTEEEEEEEEEEEEEEEEEEEEEE");
+
+
+        // pour pouvoir change les vote :
+
         // faire un boolean pour savoir si le user a voté?
         ChangeVote = new RelayCommand<VoteType>(voteType => {
-            var maxVote = Poll.GetMaxVotePossible();
             var max = Poll.Type == PollType.Single ? 1 : 0;
             
-            if (CurrentUser.Id == user.Id || CurrentUser.Role == Role.Administrator && !UserVotedForCurrentPoll) {
+            if (CurrentUser.Id == user.Id || CurrentUser.Role == Role.Administrator ) {
                 if (max == 1) {
                     if (UserVotedForCurrentPoll) {
-                        NotifyColleagues(App.Messages.MSG_NEWCHOICE_POLLSINGLE, voteType); // Si le nombre maximum de votes est 1 et le vote est déjà effectué par l'utilisateur, ne rien faire.
+                        ChangeVotePollSingle(voteType);
+                        //NotifyColleagues(App.Messages.MSG_NEWCHOICE_POLLSINGLE, voteType); // Si le nombre maximum de votes est 1 et le vote est déjà effectué par l'utilisateur, ne rien faire.
                          //p'tetre faire un notify colleague pour delete les votes
                     }
                 }
@@ -63,12 +72,39 @@ public class UserChoiceVoteViewModel : ViewModelCommon
     public User User {
         get => _user;
     }
+
+    private Choice _choice;
+    public Choice Choice {
+        get => _choice;
+        set => SetProperty(ref _choice, value);
+    }
     private bool _editMode;
     public bool EditMode {
         get => _editMode;
         set => SetProperty(ref _editMode, value);
     }
+    private void ChangeVotePollSingle(VoteType type) {
+        if(VoteGridVm == null) VoteGridVm = new VoteGridViewModel(Poll);
 
+
+        Vote.Type = type;
+
+        if (VoteGridVm == null || VoteGridVm.Poll.Type != PollType.Single || Vote.Type == VoteType.Empty) return;
+
+        var vpm = VoteGridVm.Participants.Find(u => u.Id == User.Id);
+
+        foreach (var c in vpm.Votes.Where(v => v.Choice.Id != Choice.Id)) {
+            c.Type = VoteType.Empty;
+        }
+        
+    }
+
+
+    private VoteGridViewModel _voteVm;
+    public VoteGridViewModel VoteGridVm {
+        get => _voteVm;
+        set => SetProperty(ref _voteVm, value);
+    }
     public ICommand ChangeVote { get; set; }
 
     public bool HasVoted {
