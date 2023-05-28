@@ -48,8 +48,8 @@
 
         <DockPanel Grid.Row="3" Grid.ColumnSpan="2" Margin="30,0,0,-21" HorizontalAlignment="Left" Width="170" Height="20" VerticalAlignment="Bottom">
             <Button x:Name="btnCancel" Content="Cancel" 
-                        HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" IsCancel="True" Margin="0,0,10,0" 
-                        Click="btnCancel_Click" />
+                        HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" IsCancel="True" Margin="0,0,10,0" Command="{Binding GoBackCommand}"
+                        /> <!--Click="btnCancel_Click"-->
             <Button x:Name="btnSignUp" Content="Sign Up" 
                     HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" IsDefault="True"  Margin="10,0,0,0" 
                     Command="{Binding SignUpCommand}"/>

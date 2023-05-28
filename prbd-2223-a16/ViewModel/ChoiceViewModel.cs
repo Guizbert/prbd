@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Microsoft.EntityFrameworkCore;
 using MyPoll.Model;
 using PRBD_Framework;
 using static MyPoll.App;
@@ -78,7 +79,8 @@ public class ChoiceViewModel : ViewModelCommon {
 
         RaisePropertyChanged();
         NotifyColleagues(App.Messages.MSG_UPDATE_COMMENT, Poll);
-        
+        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+
     }
 
     public void EditChoice() {
@@ -104,8 +106,34 @@ public class ChoiceViewModel : ViewModelCommon {
         Context.Choices.Update(newChoice);
         RaisePropertyChanged();
         NotifyColleagues(App.Messages.MSG_UPDATE_COMMENT, Poll);
+        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+
     }
 
+    public void cancel() {
+        foreach (var entry in Context.ChangeTracker.Entries()) {
+            switch (entry.State) {
+                case EntityState.Modified:
+                    entry.CurrentValues.SetValues(entry.OriginalValues);
+                    entry.State = EntityState.Unchanged;
+                    break;
+                case EntityState.Added:
+                    entry.State = EntityState.Detached;
+                    break;
+                case EntityState.Deleted:
+                    entry.State = EntityState.Unchanged;
+                    break;
+            }
+        }
+        EditMode = false;
+        Dispose();
+        NotifyColleagues(App.Messages.MSG_UPDATE_COMMENT, Poll);
+        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+
+    }
+    public void SaveChoiceChanges() {
+        Context.SaveChanges();
+    }
 
 }
 

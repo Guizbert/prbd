@@ -84,51 +84,66 @@ public class ChoiceListViewModel : ViewModelCommon {
 
     
 
-    private void RefreshChoice() {
-        Choice = Poll.Choices.FirstOrDefault(c => c.Id == Choice.Id);
-        //ChoiceVM = _choices
-        //    .Select(c => new UserChoiceVoteViewModel(User, c, Poll))        // mettre la vue avec les choix
-        //    .ToList();
-    }
+    //private void RefreshChoice() {
+    //    Choice = Poll.Choices.FirstOrDefault(c => c.Id == Choice.Id);
+    //    //ChoiceVM = _choices
+    //    //    .Select(c => new UserChoiceVoteViewModel(User, c, Poll))        // mettre la vue avec les choix
+    //    //    .ToList();
+    //}
     private void Save() {
         EditMode = false;
-        var choice = Poll.Choices.FirstOrDefault(c => c.Label == Choice.Label);
-        if(Choice.Label != choice.Label) {
-            choice.Label = Choice.Label;
-            //Label = choice.Label;
-            Context.SaveChanges();
-        }
+        //var choice = Poll.Choices.FirstOrDefault(c => c.Label == Choice.Label);
+        Choice.Label = Label;
+
+        //_label = choice.Label;
+
+        //Label = choice.Label;
+        //Context.SaveChanges();
+
     }
 
     private void Cancel() {
         //pas bon
 
-        var c = Context.Choices.FirstOrDefault(c => c.Id == Choice.Id);
-        _label = c.Label;
+        var c = Context.Choices.FirstOrDefault(c => c.Id == Choice.Id || c.Label == Choice.Label);
+        Label = Choice.Label;
 
         Console.WriteLine(Label +" teest ");
 
-        EditMode = false;
-        Choice.Label = Label;
-        Choice.Reload();
-        Context.SaveChanges();
+        Console.WriteLine(Choice.Label + " teest 2");
 
-        RefreshChoice();
+
+        EditMode = false;
+       
+        Choice.Reload();
+        //Context.SaveChanges();
+
+       // RefreshChoice();
         //Changed?.Invoke(); // déclenche l'event. le ? pour check si l'event est null
 
-        //Dispose();
+        Dispose();
+        RaisePropertyChanged(nameof(Label));
     }
 
-    private void Delete() {       
-        Poll.Choices.Remove(Choice);
-        Context.Choices.Remove(Choice);
-        _choiceVM.ChoicesVm.Remove(this);
-
-        Changed?.Invoke(); // déclenche l'event. le ? pour check si l'event est null
+    private void Delete() {
+        if (Choice.Votes.Count > 0) {
+            if(App.Confirm("You're about to delete the choice '"+Choice.Label+"' are you sure?")) {
+                Poll.Choices.Remove(Choice);
+                Context.Choices.Remove(Choice);
+                _choiceVM.ChoicesVm.Remove(this);
+                Changed?.Invoke(); // déclenche l'event. le ? pour check si l'event est null
+            }
+        } else {
+            Poll.Choices.Remove(Choice);
+            Context.Choices.Remove(Choice);
+            _choiceVM.ChoicesVm.Remove(this);
+            Changed?.Invoke(); // déclenche l'event. le ? pour check si l'event est null
+        }
     }
 
+   
     protected override void OnRefreshData() {
-        RefreshChoice();
+        //RefreshChoice();
     }
 
 }

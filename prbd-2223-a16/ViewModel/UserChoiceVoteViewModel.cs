@@ -42,12 +42,14 @@ public class UserChoiceVoteViewModel : ViewModelCommon
             HasVotedNo = Vote.Type == VoteType.No;
             HasVotedYes = Vote.Type == VoteType.Yes;
             HasVotedMaybe = Vote.Type == VoteType.Maybe;
-            NoVote = Vote.Type == VoteType.Empty; 
+            //NoVote = Vote.Type == VoteType.Empty; 
             RaisePropertyChanged(nameof(GetCurrentIcon));
             RaisePropertyChanged(nameof(GetCurrentChoiceColor));
         });
         Console.WriteLine(ChangeVote);
         Console.WriteLine(GetCurrentIcon + "  <------------- CURRENTCOLOR ");
+        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+
 
         HasVoted = user.Votes.Any(v => v.Choice.Id == choice.Id);
     }

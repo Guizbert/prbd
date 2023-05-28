@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Navigation;
 using MyPoll.Model;
 using MyPoll.View;
 using PRBD_Framework;
@@ -14,6 +15,7 @@ class SignUpViewModel : ViewModelCommon {
     /*pseudo, mail , password, passwordConfirm*/
 
     public ICommand SignUpCommand { get; set; }
+    public ICommand GoBackCommand { get; set; }
 
     private string _pseudo;
     private string _email;
@@ -42,7 +44,7 @@ class SignUpViewModel : ViewModelCommon {
         SignUpCommand = new RelayCommand(SignUpAction, () => {
             return _pseudo != null && _email != null && _password != null && _passwordConfirm != null;
             });
-        
+        GoBackCommand = new RelayCommand(GoBack);
     }
     private void SignUpAction() {
         if (Validate()) {
@@ -113,6 +115,11 @@ class SignUpViewModel : ViewModelCommon {
         }
         return !HasErrors;
 
+    }
+
+
+    public void GoBack() {
+        App.NotifyColleagues(App.Messages.MSG_GOBACK_LOGIN);
     }
 }
 

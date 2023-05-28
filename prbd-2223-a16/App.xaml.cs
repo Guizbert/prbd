@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using MyPoll.Model;
+using MyPoll.View;
 using MyPoll.ViewModel;
 using PRBD_Framework;
 
@@ -8,6 +9,7 @@ namespace MyPoll;
 public partial class App : ApplicationBase<User, MyPollContext > {
     // TODO : afficher les best choices
     public enum Messages {
+        MSG_GOBACK_LOGIN,
         MSG_NEW_MEMBER,             // nouveau membre
         MSG_CREATE_POLL,            // nouveau poll
         MSG_CREATED_POLL,           // création poll
@@ -40,6 +42,10 @@ public partial class App : ApplicationBase<User, MyPollContext > {
         Register<User>(this, Messages.MSG_LOGIN, user => {
             Login(user);
             NavigateTo<MainViewModel, User, MyPollContext>();
+        });
+        Register(this, Messages.MSG_GOBACK_LOGIN,() => {
+            //Login(user);
+            NavigateTo<LoginViewModel, User, MyPollContext>();
         });
         Register<User>(this, Messages.MSG_NEW_MEMBER, user => {
             //Login(user);

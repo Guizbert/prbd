@@ -20,7 +20,7 @@
             
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" Visibility="{c:Binding !EditMode}" />
-                    <TextBox Text="{Binding Choice.Label}" Visibility="{c:Binding EditMode}" />
+                    <TextBox Text="{Binding Label}" Visibility="{c:Binding EditMode}" />
                 </StackPanel>
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="{Binding Choice.Votes.Count, StringFormat=' ({0})'}" TextTrimming="CharacterEllipsis" />

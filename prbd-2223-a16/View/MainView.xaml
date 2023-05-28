@@ -17,7 +17,7 @@
     <Window.DataContext>
         <vm:MainViewModel x:Name="vm"/>
     </Window.DataContext>
-    <Grid>
+    <Grid Background="LightGray">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="1*"/>
