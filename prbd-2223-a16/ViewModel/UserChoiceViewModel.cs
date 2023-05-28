@@ -16,6 +16,7 @@ public class UserChoiceViewModel : ViewModelCommon
         _voteGridViewModel = voteGridViewModel;
 
         _choices = choices;
+        _choicesSave = _choices;
 
         Poll = voteGridViewModel.Poll;
         User = user;
@@ -25,9 +26,6 @@ public class UserChoiceViewModel : ViewModelCommon
         SaveCommand = new RelayCommand(Save);
         CancelCommand = new RelayCommand(Cancel);
         DeleteCommand = new RelayCommand(Delete);
-        Register<VoteType>(App.Messages.MSG_NEWCHOICE_POLLSINGLE, v => Clear());
-
-
         /*
                 verif ici le mode single :
                         -> rechercher dans le gridvm dans userVm rechercher le participant courant parcourir ses choix et changer ses votes et mettre a empty
@@ -44,6 +42,7 @@ public class UserChoiceViewModel : ViewModelCommon
     public ICommand DeleteCommand { get; }
 
     private List<Choice> _choices;
+    private List<Choice> _choicesSave;
 
     public User User { get; }
 
@@ -97,10 +96,14 @@ public class UserChoiceViewModel : ViewModelCommon
     }
 
     private void RefreshVoteDb() {
-        VoteVM = Context.Votes
-            .Where(v => v.User == User && v.Choice.Poll == Poll )
-            .Select(v => new UserChoiceVoteViewModel(User, v.Choice, Poll))
-            .ToList();
+        //VoteVM = Context.Votes
+        //   .Where(v => v.User == User && v.Choice.Poll == Poll && (v.Type == VoteType.Yes || v.Type == VoteType.No || v.Type == VoteType.Maybe || v.Type == VoteType.Empty || v == null))
+        //   .Select(v => new UserChoiceVoteViewModel(User, v.Choice, Poll))
+        //   .ToList();
+
+        VoteVM = _choicesSave
+            .Select(c => new UserChoiceVoteViewModel(User, c, Poll))        // mettre la vue avec les choix
+            .ToList(); ;
 
         // faire une fonction en db en utilisant la db
     }
@@ -139,6 +142,7 @@ public class UserChoiceViewModel : ViewModelCommon
         // Remove votes from the current poll
         var currentChoicesId = _choices.Select(c => c.Id).ToList();
         var voteToDelete = User.Votes.Where(v => currentChoicesId.Contains(v.Choice.Id)).ToList();
+
         foreach (var vote in voteToDelete) {
             User.Votes.Remove(vote);
         }
@@ -148,18 +152,6 @@ public class UserChoiceViewModel : ViewModelCommon
         VoteVM.Clear(); 
         Context.SaveChanges();
         OnRefreshData();
-
-    }
-    private void Clear() {
-        // Remove votes from the current poll
-        var currentChoicesId = _choices.Select(c => c.Id).ToList();
-        var voteToDelete = User.Votes.Where(v => currentChoicesId.Contains(v.Choice.Id)).ToList();
-        foreach (var vote in voteToDelete) {
-            User.Votes.Remove(vote);
-        }
-        VoteVM.Clear(); 
-        Context.SaveChanges();
-        //OnRefreshData();
 
     }
 

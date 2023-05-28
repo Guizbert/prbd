@@ -326,7 +326,7 @@ internal class PollDetailViewModel : ViewModelCommon {
                     Choices = cvm.Choices;
             }
             Poll.Participants = UserParticipants;
-            Poll.Choices = Choices;
+            //Poll.Choices = Choices;
             Poll.Closed = IsClosed;
             Context.Update(Poll);
         }
@@ -356,9 +356,10 @@ internal class PollDetailViewModel : ViewModelCommon {
             IsNew = false;
         } else {
             Poll.Reload();
-            Poll.Choices = Choices;
-            Poll.Participants = UserParticipants;
-            RaisePropertyChanged();
+            //Context.Entry(Poll).State 
+            //Poll.Choices = Choices;
+            //Poll.Participants = UserParticipants;
+            //RaisePropertyChanged();
         }
         NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
@@ -366,7 +367,7 @@ internal class PollDetailViewModel : ViewModelCommon {
     }
 
     private bool CanCancelAction() {
-        return Poll != null && (IsNew || Poll.IsModified ) ;
+        return Poll != null && (IsNew || Poll.IsModified || Choices != Poll.Choices || UserParticipants != Poll.Participants ) ;
         //return Poll != null && (IsNew || Poll.IsModified ||
         //    Poll.Participants != null ||
         //    Poll.Participants.Any() ||

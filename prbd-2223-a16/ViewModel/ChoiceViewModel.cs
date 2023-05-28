@@ -75,6 +75,7 @@ public class ChoiceViewModel : ViewModelCommon {
         _choicesVm.Insert(0, AddToVm);
         ChoiceLabel = "";
         Context.Choices.Add(newChoice);
+
         RaisePropertyChanged();
         NotifyColleagues(App.Messages.MSG_UPDATE_COMMENT, Poll);
         
@@ -100,17 +101,9 @@ public class ChoiceViewModel : ViewModelCommon {
 
         _choicesVm.Insert(0, AddToVm);
         ChoiceLabel = "";
-        Context.Choices.Add(newChoice);
+        Context.Choices.Update(newChoice);
         RaisePropertyChanged();
         NotifyColleagues(App.Messages.MSG_UPDATE_COMMENT, Poll);
-        
-    }
-    
-
-
-    public void Cancel() {
-        App.ClearContext();
-        NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
     }
 
 

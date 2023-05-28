@@ -25,10 +25,7 @@ public class VoteGridViewModel : ViewModelCommon
 
         _userVm = participants.Select(s => new UserChoiceViewModel(this, s, _choices)).ToList();
     }
-    public VoteGridViewModel()
-    {
-
-    }
+    public VoteGridViewModel(){}
     private List<Choice> _choices;
     public List<Choice> Choices => _choices;
 
@@ -46,7 +43,6 @@ public class VoteGridViewModel : ViewModelCommon
     // Méthode appelée lorsqu'on veut éditer une ligne ou lorsqu'on a fini d'éditer une ligne
     public void AskEditMode(bool editMode) {
         EditMode = editMode;
-
         // Change la visibilité des boutons de chacune des lignes
         // (voir la logique dans UserChoiceViewModel)
         foreach (var u in UserVm)

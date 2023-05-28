@@ -45,7 +45,7 @@
             <Grid Grid.Row="1" Visibility="{Binding CanReoPen, Converter={f:BoolToVisibleConverter}}">
                 <StackPanel Background="LightPink" Orientation="Horizontal" Margin="5">
                     <TextBlock Text="This poll has been closed!" FontWeight="Bold" FontSize="14" Margin="0,0,10,0" Height="19" />
-                    <Button Content="Reopen" Height="23" />
+                    <Button Content="Reopen" Command="{Binding ReOpenCommand}" Height="23" />
                 </StackPanel>
             </Grid>
 

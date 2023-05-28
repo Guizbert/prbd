@@ -65,6 +65,7 @@ internal class PollChoicesViewModel : ViewModelCommon{
     public ICommand AddCommentCommand { get; set; }
     public ICommand DeleteCommentCommand { get; set; }
     public ICommand ShowTextBoxCommand { get; set; }
+    public ICommand ReOpenCommand { get; set; }
 
     private string _textToAdd;
 
@@ -80,6 +81,13 @@ internal class PollChoicesViewModel : ViewModelCommon{
     public void ShowTextBox() {
         AddComment = true;
         Console.WriteLine(AddComment + " Can write ? <--------");
+    }
+    public void ReOpenPoll() {
+        Poll.Closed = false;
+        Console.WriteLine(Poll.Closed + " isOpened ? <--------");
+        Context.SaveChanges();
+        RaisePropertyChanged(nameof(CanReoPen));
+        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
     }
     public void AddCommentAction() {
         if (string.IsNullOrEmpty(TextToAdd)) {
@@ -166,6 +174,7 @@ internal class PollChoicesViewModel : ViewModelCommon{
         DeleteCommentCommand = new RelayCommand<Comment>(DeleteCommentAction);
         AddCommentCommand = new RelayCommand(AddCommentAction);
         ShowTextBoxCommand = new RelayCommand(ShowTextBox);
+        ReOpenCommand = new RelayCommand(ReOpenPoll);
 
         Console.WriteLine(IsCreator + " Is Creator ? <--------");
         Console.WriteLine(AddComment + " I AddComment ? <--------");

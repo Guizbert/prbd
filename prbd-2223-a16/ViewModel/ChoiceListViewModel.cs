@@ -85,6 +85,7 @@ public class ChoiceListViewModel : ViewModelCommon {
     
 
     private void RefreshChoice() {
+        Choice = Poll.Choices.FirstOrDefault(c => c.Id == Choice.Id);
         //ChoiceVM = _choices
         //    .Select(c => new UserChoiceVoteViewModel(User, c, Poll))        // mettre la vue avec les choix
         //    .ToList();
@@ -112,6 +113,7 @@ public class ChoiceListViewModel : ViewModelCommon {
         Choice.Reload();
         Context.SaveChanges();
 
+        RefreshChoice();
         //Changed?.Invoke(); // déclenche l'event. le ? pour check si l'event est null
 
         //Dispose();
