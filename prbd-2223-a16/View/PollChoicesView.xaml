@@ -56,7 +56,7 @@
 
 
             <!-- Liste des commentaires -->
-            <StackPanel Grid.Row="4" Visibility="{Binding CanEditPoll, Converter={f:BoolToCollapsedConverter}}">
+            <StackPanel Grid.Row="4" Visibility="{Binding CanEditPoll, Converter={f:BoolToCollapsedConverter}}" IsEnabled="{Binding IsntClosed}">
                 <StackPanel Orientation="Horizontal" Margin="22,20,50,0">
                     <TextBlock FontWeight="Bold">
                     <Run Text="Comment" FontSize="17" />
