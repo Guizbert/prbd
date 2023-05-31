@@ -115,8 +115,25 @@ public class Poll : EntityBase<MyPollContext> {
     }
 
     public void Delete() {
-        // doit delete les choix, vote, ?
+        // Supprime les choix, les votes, etc.
+        Choices.Clear();
 
+        var votesToDelete = Choices.SelectMany(c => c.Votes).ToList();
+        Context.Votes.RemoveRange(votesToDelete);
+
+        Choices.Clear();
+        Participants.Clear();
+
+        var commentsToDelete = Context.Comments.Where(c => commentaires.Contains(c)).ToList();
+        Context.Comments.RemoveRange(commentsToDelete);
+
+        Context.Polls.Remove(this);
+        Context.SaveChanges();
+
+       /* // doit delete les choix, vote, ?
+        Choices.Clear();
+        var v = Choices.SelectMany(c => c.Votes).ToList();
+        //v.ForEach(v.Remove(v))
         foreach(Choice c in Choices) {
             c.Votes.Clear();
         }
@@ -127,6 +144,6 @@ public class Poll : EntityBase<MyPollContext> {
         }
         
         Context.Polls.Remove(this);
-        Context.SaveChanges();
+        Context.SaveChanges();*/
     }
 }

@@ -29,6 +29,11 @@ public partial class MainView : WindowBase {
         Register<Poll>(App.Messages.MSG_POLL_NAMECHANGED,
          Poll => DoRenameTab(string.IsNullOrEmpty(Poll.Name) ? "<New Poll>" : Poll.Name));
 
+        Register<Poll>(App.Messages.MSG_REFRESH_WINDOW,
+         Poll => MSG_REFRESH_WINDOW(Poll, false));
+
+
+
     }
 
 
@@ -37,6 +42,14 @@ public partial class MainView : WindowBase {
     }
     private void DoDisplayPollElements(Poll poll, bool isNew) {
         if(poll != null) {
+            OpenTab(poll.Name, poll.Name, () => new PollChoicesView(poll, isNew));
+        }
+    }
+    private void MSG_REFRESH_WINDOW(Poll poll, bool isNew) {
+        // refesh la window quand on reopen un poll depuis la page pollChoices
+        // car j'arrivais seulement a remettre le add Choice mais le vote ne se mettait pas a jour et on devait quitter puis remettre la view pour pouvoir voter
+        if (poll != null) {
+            DoCloseTab(poll);
             OpenTab(poll.Name, poll.Name, () => new PollChoicesView(poll, isNew));
         }
     }

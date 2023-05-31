@@ -32,13 +32,14 @@ internal class PollChoicesViewModel : ViewModelCommon{
         set=> SetProperty(ref _canEditPoll, value);
     }
     public bool IsCreator => CurrentUser == Poll.Creator || CurrentUser.Role == Role.Administrator;
-    public bool CanReoPen => CurrentUser == Poll.Creator && Poll.Closed;
+    public bool CanReoPen => IsCreator && Poll.Closed;
 
     // afficher en haut de la page:
     public string Title { get => Poll.Name; }
     public string Creator => Poll.Creator.FullName;
         // afficher message si poll est closed (Que le creator / Admin?) qui peut y avoir accès avec un background rose un peu
     public bool IsClosed => Poll.Closed;
+    public bool IsntClosed => !Poll.Closed;
 
     // Commentaire pour le 'bouton add comment'
 
@@ -86,8 +87,11 @@ internal class PollChoicesViewModel : ViewModelCommon{
         Poll.Closed = false;
         Console.WriteLine(Poll.Closed + " isOpened ? <--------");
         Context.SaveChanges();
-        RaisePropertyChanged(nameof(CanReoPen));
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+        NotifyColleagues(App.Messages.MSG_REFRESH_WINDOW, Poll);
+        RaisePropertyChanged();
+        RaisePropertyChanged(nameof(CanReoPen));
+        RaisePropertyChanged(nameof(IsntClosed));
     }
     public void AddCommentAction() {
         if (string.IsNullOrEmpty(TextToAdd)) {

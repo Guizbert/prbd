@@ -25,8 +25,9 @@ public class UserChoiceVoteViewModel : ViewModelCommon
             var max = Poll.Type == PollType.Single ? 1 : 0;
             if (CurrentUser.Id == user.Id || CurrentUser.Role == Role.Administrator ) {
                 if (max == 1) {
-                     ChangeVotePollSingle(voteType);
-                        //NotifyColleagues(App.Messages.MSG_NEWCHOICE_POLLSINGLE, voteType); // Si le nombre maximum de votes est 1 et le vote est déjà effectué par l'utilisateur, ne rien faire.
+                    ChangeVotePollSingle(voteType);
+                        //NotifyColleagues(App.Messages.MSG_NEWCHOICE_POLLSINGLE, voteType);
+                        // Si le nombre maximum de votes est 1 et le vote est déjà effectué par l'utilisateur, ne rien faire.
                         //p'tetre faire un notify colleague pour delete les votes
                 }
                 if (Vote.Type != VoteType.Empty && voteType != VoteType.Empty) {
@@ -76,16 +77,24 @@ public class UserChoiceVoteViewModel : ViewModelCommon
         set => SetProperty(ref _editMode, value);
     }
     private void ChangeVotePollSingle(VoteType type) {
-        if(VoteGridVm == null) VoteGridVm = new VoteGridViewModel(Poll);
+        if (VoteGridVm == null) VoteGridVm = new VoteGridViewModel(Poll);
+        if(Vote != null) {
+            if (type == VoteType.Empty)
+                Context.Remove(Vote);
+            else
+                Vote.Type = type;
+        }
+                
+        NotifyColleagues(App.Messages.MSG_UPDATE_VOTE, VoteGridVm);
 
-        Vote.Type = type;
 
         if (VoteGridVm == null || VoteGridVm.Poll.Type != PollType.Single || Vote.Type == VoteType.Empty) return;
 
         var vpm = VoteGridVm.Participants.Find(u => u.Id == User.Id);
 
         foreach (var c in vpm.Votes.Where(v => v.Choice.Id != Choice.Id && v.Choice.Poll == Poll)) {
-            c.Type = VoteType.Empty;
+            //c.Type = VoteType.Empty;
+            Context.Remove(c);
         }
         
     }

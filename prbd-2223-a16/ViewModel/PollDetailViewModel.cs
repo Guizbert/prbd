@@ -11,16 +11,11 @@ using System.Windows.Media;
 using MyPoll.Model;
 using MyPoll.View;
 using PRBD_Framework;
+using Microsoft.IdentityModel.Tokens;
 
 namespace MyPoll.ViewModel;
 
 internal class PollDetailViewModel : ViewModelCommon {
-
-
-    /* faire un notify colleague qui doit recevoir un choice quand on veut le delete 
-     et dans le constructeur mettre un register choice qui dit
-    'quand je recois le notify, je le remove de ma collection'
-    */
     public ICommand Save { get; set; }
     public ICommand Cancel { get; set; }
     public ICommand AddMyselfCommand { get; set; }
@@ -68,11 +63,11 @@ internal class PollDetailViewModel : ViewModelCommon {
     }
     public string Title {
         get => Poll.Name;
-        set => SetProperty(Poll.Name, value, Poll, (t, v) => {
-            t.Name = v;
-            //NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
-            NotifyColleagues(App.Messages.MSG_POLL_NAMECHANGED, Poll);
-            //ajout validation
+        set => SetProperty(Poll.Name, value, Poll, (p, v) => {
+            p.Name = v;
+            Validate();
+            //NotifyColleagues(App.Messages.MSG_POLL_NAMECHANGED, Poll);
+            
         });
     }
     private int _creatorId;
@@ -91,6 +86,12 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(ref _isClosed, value);
     }
 
+    private bool _canChangeType;
+    public bool CanChangeType {
+        get => _canChangeType;
+        set => SetProperty(ref _canChangeType, value);
+    }
+
     public static IEnumerable<User> AllParticipants {
         get {
             return Poll.AllUsers;
@@ -107,6 +108,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         get => _selectedPollType;
         set {
             _selectedPollType = value;
+            ValidatePollType();
             RaisePropertyChanged(nameof(SelectedPollType));
         }
     }
@@ -120,21 +122,6 @@ internal class PollDetailViewModel : ViewModelCommon {
             RaisePropertyChanged(nameof(SelectedUser));
         }
     }
-
-    private User _selectedUserToDelete;
-
-    public User SelectedUserToDelete {
-        get => _selectedUserToDelete;
-        set => SetProperty(ref _selectedUserToDelete, value);
-    }
-
-    //private ChoiceViewModel _selectedChoice;
-
-    //public ChoiceViewModel SelectedChoice {
-    //    get => _selectedChoice;
-    //    set => SetProperty(ref _selectedChoice, value);
-    //}
-
     private ObservableCollection<User> _participants;
 
     public ObservableCollection<User> UserParticipants {
@@ -145,11 +132,21 @@ internal class PollDetailViewModel : ViewModelCommon {
     private ObservableCollectionFast<Choice> _choices;
     public ObservableCollectionFast<Choice> Choices {
         get => _choices;
-        set => SetProperty(ref _choices, value, () => AddChoice());
+        set => SetProperty(ref _choices, value);
+    }
+    private bool _noParticipant;
+    public bool NoParticipant {
+        get => _noParticipant;
+        set => SetProperty(ref _noParticipant, value, () => HasParticipant());
+    }
+
+    private bool _noChoices;
+    public bool NoChoices {
+        get => _noChoices;
+        set => SetProperty(ref _noChoices, value, () => HasChoices());
     }
 
     private bool _isEditingChoice;
-
     public bool IsEditingChoice {
         get => _isEditingChoice;
         set => SetProperty(ref _isEditingChoice, value);
@@ -178,6 +175,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         if (CanAddParticipant()) {
             Console.WriteLine("Ajout participant" + SelectedUser.FullName);
             UserParticipants.Add(SelectedUser); // Ajouter l'utilisateur sélectionné à la liste de participants
+            HasParticipant();
         } else {
             Console.WriteLine("peut pas l'ajouter");
             //ajout message erreur?
@@ -207,7 +205,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         return SelectedUser != null && !UserParticipants.Any(p => p.Id == SelectedUser.Id); // Vérifier si l'utilisateur est sélectionné et n'est pas déjà dans la liste de participants
     }
 
-
+    /*  ======================================================== CONSTRUCTEUR ======================================================== */
     public PollDetailViewModel(Poll poll, bool isNew)
     {
         Poll = poll;
@@ -216,8 +214,11 @@ internal class PollDetailViewModel : ViewModelCommon {
         IsEditingChoice = false;
         UserParticipants = new ObservableCollectionFast<User>(Poll.Participants.OrderBy(u => u.FullName));
         Choices = new ObservableCollectionFast<Choice>(poll.Choices.OrderBy(c => c.Label));
+        HasParticipant();
         SetNbVoteUser();
 
+        Console.WriteLine(NoParticipant + " NO PARTICIPANT ?????");
+        Console.WriteLine(NoChoices + " NO CHOICES ?????");
 
         var listChoice = new ChoiceViewModel(Poll);
         ChoiceViewModel.Add(listChoice);
@@ -226,19 +227,16 @@ internal class PollDetailViewModel : ViewModelCommon {
         SelectedPollType = Poll.Type;
 
         Save = new RelayCommand(SaveAction, CanSaveAction);
-        Cancel = new RelayCommand(CancelAction, CanCancelAction);
+        Cancel = new RelayCommand(CancelAction);
         //Delete = new RelayCommand(DeleteAction, () => !IsNew);
 
         AddChoiceCommand = new RelayCommand(AddChoice);
 
         AddMyselfCommand = new RelayCommand(AddMyself);
         AddAllParticipantsCommand = new RelayCommand(AddAll);
-
         DeleteParticipantCommand = new RelayCommand<int>(DeleteParticipant);
-
-        
+                
         //DeleteChoiceCommand = new RelayCommand<int>(DeleteChoice);
-        UpdateChoiceCommand = new RelayCommand(UpdateChoice);
 
         RaisePropertyChanged();
         refreshList();
@@ -256,6 +254,10 @@ internal class PollDetailViewModel : ViewModelCommon {
     public void AddMyself() {
         if (!UserParticipants.Contains(CurrentUser)) {
             UserParticipants.Add(CurrentUser); // Ajouter l'utilisateur sélectionné à la liste de participants
+            if (NoParticipant) {
+                NoParticipant = false;
+                RaisePropertyChanged(nameof(NoParticipant));
+            }
         }
         RaisePropertyChanged(nameof(UserParticipants));
     }
@@ -264,25 +266,31 @@ internal class PollDetailViewModel : ViewModelCommon {
             if (!UserParticipants.Contains(user)) {
                 UserParticipants.Add(user);
             }
+            HasParticipant();
+
         }
         RaisePropertyChanged(nameof(UserParticipants));
     }
     private void DeleteParticipant(int userid) {
         var user = UserParticipants.FirstOrDefault(u => u.Id == userid);
+        var votesToDelete = Poll.Choices.SelectMany(c => c.Votes.Where(v => v.User == user)).ToList();
         Console.WriteLine(user.Id + " < - - - -");
         if(user.NbVote > 0 ) {
-            if(App.Confirm("you're about to delete the user " + user.FullName + " but he already voted in your poll. Are you sure?"))
+            if(App.Confirm("you're about to delete the user " + user.FullName + " but he already voted in your poll. Are you sure?")) {
+                /* autre méthode que app.confirm
+                 var result = MessageBox.Show("message ","Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                */
                 UserParticipants.Remove(user); // remove l'utilisateur sélectionné de la liste des participants
+                foreach (var vote in votesToDelete) {
+                    Context.Votes.Remove(vote);
+                }
+            }
         } else {
             UserParticipants.Remove(user); 
         }
+        HasParticipant();
         refreshList();
-    }
-
-    private void UpdateChoice() {                               // <------ TODO  ------>
-        IsNotEditingChoice = false;
-        IsEditingChoice = true;
-        Console.WriteLine(IsEditingChoice + " <- yeah");
+        RaisePropertyChanged();
     }
 
     public void SetNbVoteUser(User u) {
@@ -297,92 +305,125 @@ internal class PollDetailViewModel : ViewModelCommon {
 
     public override void SaveAction()
     {
-        if (IsNew) {
+        if (Validate()) {
+            if (IsNew) {
 
-            var newPoll = new Poll(
-                Title = Title,
-                CreatorId = CreatorId,
-                SelectedPollType = SelectedPollType,
-                IsClosed = IsClosed);
-            Context.Add(newPoll);
-            Poll = newPoll; // pour récup l'id
-            newPoll.Participants = UserParticipants;
-            foreach(var cvm in ChoiceViewModel)
-               Choices = cvm.Choices;
-
-            newPoll.Choices = Choices;
-            IsNew = false;
-        } else {
-            foreach (var cvm in ChoiceViewModel) {
-                cvm.SaveChoiceChanges();
-                if(cvm.Choices.Count > 0)
-                    Choices = cvm.Choices;
+                var newPoll = new Poll(
+                    Title = Title,
+                    CreatorId = CreatorId,
+                    SelectedPollType = SelectedPollType,
+                    IsClosed = IsClosed);
+                Context.Add(newPoll);
+                Poll = newPoll; // pour récup l'id
+                newPoll.Participants = UserParticipants;
+                newPoll.Choices = ChoiceViewModel.SelectMany(c => c.Choices).ToList();
+                IsNew = false;
+            } else {
+                Poll.Participants = UserParticipants;
+                //Poll.Choices = Choices;
+                Poll.Closed = IsClosed;
+                Poll.Type = SelectedPollType;
+                Poll.Choices = Choices;
+                Context.Update(Poll);
             }
-            Poll.Participants = UserParticipants;
-            //Poll.Choices = Choices;
-            Poll.Closed = IsClosed;
-            Context.Update(Poll);
+
+            Context.SaveChanges();
+
+            NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
+            NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+            NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
+            NotifyColleagues(App.Messages.MSG_CLOSE_TAB, null);
         }
-
-        Context.SaveChanges();
-
-        NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
-        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
-        NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
+       
     }
 
     private bool CanSaveAction() {
         if (IsNew) {
-            return
-                !string.IsNullOrEmpty(Title) ;
+            return !string.IsNullOrEmpty(Title) && !HasErrors && !NoParticipant;
         }
-        return ( Poll.Name != null && 
-            Poll.IsModified && (
-            Poll.Participants != null &&
-            Poll.Participants != UserParticipants) ||
-            (Poll.Choices != null &&
-            Poll.Choices != Choices));
+       
+        return !HasErrors && !NoParticipant;
     }
+   
 
     public override void CancelAction() {
+        foreach (var entry in Context.ChangeTracker.Entries()) {
+            switch (entry.State) {
+                case EntityState.Modified:
+                    entry.CurrentValues.SetValues(entry.OriginalValues);
+                    entry.State = EntityState.Unchanged;
+                    break;
+                case EntityState.Added:
+                    entry.State = EntityState.Detached;
+                    break;
+                case EntityState.Deleted:
+                    entry.State = EntityState.Unchanged;
+                    break;
+            }
+        }
         if (IsNew) {
             IsNew = false;
+            NotifyColleagues(App.Messages.MSG_CLOSE_TAB, null);
         } else {
-            foreach (var entry in Context.ChangeTracker.Entries()) {
-                switch (entry.State) {
-                    case EntityState.Modified:
-                        entry.CurrentValues.SetValues(entry.OriginalValues);
-                        entry.State = EntityState.Unchanged;
-                        break;
-                    case EntityState.Added:
-                        entry.State = EntityState.Detached;
-                        break;
-                    case EntityState.Deleted:
-                        entry.State = EntityState.Unchanged;
-                        break;
-                }
-            }
             Poll.Reload();
             Context.Entry(Poll).Reload();
-            //foreach (var cvm in ChoiceViewModel) {
-            //    cvm.cancel();
-            //}
-            //RaisePropertyChanged();
-            Dispose();
-
         }
-        NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
-        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
         NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
     }
 
-    private bool CanCancelAction() {
-        return Poll != null && (IsNew || Poll.IsModified || Choices != Poll.Choices || UserParticipants != Poll.Participants ) ;
-        //return Poll != null && (IsNew || Poll.IsModified ||
-        //    Poll.Participants != null ||
-        //    Poll.Participants.Any() ||
-        //    Poll.Choices != null ||
-        //    Poll.Choices.Any());
+
+
+    // partie validation
+
+    public override bool Validate() {
+        ClearErrors();
+        ValidateTitle();
+        HasChoices();
+        return !HasErrors;
     }
+
+    public bool HasChoices() {
+        foreach (var cvm in ChoiceViewModel) {
+            if (cvm.Choices.Count < 2) {
+                return false;
+            }
+        }
+        return true;
+    }
+    public void HasParticipant() {
+        NoParticipant = UserParticipants.IsNullOrEmpty();
+        RaisePropertyChanged(nameof(NoParticipant));
+    }
+
+    public bool ValidateTitle() {
+        if (string.IsNullOrEmpty(Title)) {
+            AddError(nameof(Title), "Required");
+        }
+        if(Title.Length < 3) {
+            AddError(nameof(Title), "Too short");
+        }
+        if (Title != Poll.Name) {
+            if (CurrentUser.UserPolls.Any(p => p.Name == Title) ||
+              CurrentUser.participatingIn.Any(p => p.Name == Title))
+            {
+                AddError(nameof(Title), "Already in a poll with the same name.");
+            }
+        }
+        
+        return !HasErrors;
+    }
+    public bool ValidatePollType() {
+
+        bool hasMultipleVotes = UserParticipants.Any(user =>
+        {
+            var voteCount = Poll.Choices.Sum(c => c.Votes.Count(v => v.UserId == user.Id));
+            return voteCount > 1;
+        });
+        CanChangeType = !hasMultipleVotes;
+
+        return !HasErrors;
+    }
+   
+
 }
 

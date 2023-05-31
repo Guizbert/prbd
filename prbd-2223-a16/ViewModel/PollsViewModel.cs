@@ -36,7 +36,8 @@ public class PollsViewModel : ViewModelCommon
             NotifyColleagues(App.Messages.MSG_CREATE_POLL, new Poll());
         });
         DisplayPollsDetails = new RelayCommand<PollsCardViewModel>(pc => {
-            NotifyColleagues(App.Messages.MSG_CHOICE_POLL, pc.Poll);
+            if(pc != null)
+                NotifyColleagues(App.Messages.MSG_CHOICE_POLL, pc.Poll);
         });
         Register<Poll>(App.Messages.MSG_UPDATE_POLL, poll => OnRefreshData());
     }

@@ -12,17 +12,17 @@
              xmlns:media="clr-namespace:System.Windows.Media;assembly=PresentationCore"
              xmlns:f="clr-namespace:PRBD_Framework;assembly=PRBD_Framework"
              xmlns:fap="http://schemas.fontawesome.com/icons/fonts/properties"
-             d:DesignHeight="250" d:DesignWidth="200"
+             d:DesignHeight="300" d:DesignWidth="200"
              d:DataContext="{d:DesignInstance Type=vm:ChoiceViewModel, IsDesignTimeCreatable=True}"
              x:Name="uc">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition />
+            <RowDefinition  Height="Auto"/>
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <!-- Partie pour afficher les choices du poll -->
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <Border Grid.Row="0">
+            <!-- Partie pour afficher les choices du poll -->
+        <Border  BorderBrush="Black" BorderThickness="1" Grid.Row="0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ItemsControl ItemsSource="{Binding ChoicesVm}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -30,11 +30,11 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-            </Border>
-        </ScrollViewer>
+            </ScrollViewer>
+        </Border>
         <!-- Partie pour ajouter un nouveau choice -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,10,0,0">
-            <TextBox Text="{Binding ChoiceLabel}" Width="189" Height="50" />
+            <TextBox Text="{Binding ChoiceLabel, UpdateSourceTrigger=PropertyChanged}" Width="189" Height="50" />
             <Button Content="Add" Command="{Binding AddChoiceCommand}" Margin="10,0,0,0" Width="55" Height="50" />
         </StackPanel>
     </Grid>

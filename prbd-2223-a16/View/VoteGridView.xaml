@@ -5,11 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:f="clr-namespace:PRBD_Framework;assembly=PRBD_Framework"
              xmlns:vw="clr-namespace:MyPoll.View"
-            xmlns:vm="clr-namespace:MyPoll.ViewModel"
-            d:DataContext="{d:DesignInstance Type=vm:VoteGridViewModel}"
+             xmlns:vm="clr-namespace:MyPoll.ViewModel"
+             d:DataContext="{d:DesignInstance Type=vm:VoteGridViewModel}"
              mc:Ignorable="d"
              x:Name="uc"
              d:DesignHeight="250" d:DesignWidth="300" >
+    
     <UserControl.DataContext>
         <vm:VoteGridViewModel />
     </UserControl.DataContext>

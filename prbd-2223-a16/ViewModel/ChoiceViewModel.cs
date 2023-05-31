@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MyPoll.Model;
 using PRBD_Framework;
 using static MyPoll.App;
@@ -19,16 +20,23 @@ public class ChoiceViewModel : ViewModelCommon {
     }
 
     public ICommand AddChoiceCommand { get; set; }
+
+    /* ==================================== CONSTRUCTEUR ====================================*/
     public ChoiceViewModel(Poll poll) {
        // _choices = new ObservableCollectionFast<Choice>(poll.Choices.OrderBy(c => c.Label).ToList());
         _choices = new ObservableCollectionFast<Choice>(poll.Choices.OrderBy(c => c.Label));
         Poll = poll;
-
+        HasChoices();
         _choicesVm = new ObservableCollectionFast<ChoiceListViewModel>(_choices.Select(c =>  new ChoiceListViewModel(poll, c, this)));
         //_choicesVm = new ObservableCollectionFast<ChoiceListViewModel>(poll, c, this);
 
         AddChoiceCommand = new RelayCommand(AddChoice);
+    }
 
+    private bool _noChoices;
+    public bool NoChoices {
+        get => _noChoices;
+        set => SetProperty(ref _noChoices, value);
     }
 
     private string _choiceLabel;
@@ -64,50 +72,50 @@ public class ChoiceViewModel : ViewModelCommon {
         // (voir la logique dans UserChoiceViewModel)
     }
     public void AddChoice() {
-        // ajouter validation (if(!haserror)
-        var newChoice = new Choice { Label = ChoiceLabel };
-        // faire validation
-        Poll.Choices.Add(newChoice);
-        _choices.Add(newChoice);
+        if (validate()) {
+            // ajouter validation (if(!haserror)
+            var newChoice = new Choice { Label = ChoiceLabel };
+            // faire validation
+            Poll.Choices.Add(newChoice);
+            _choices.Add(newChoice);
 
-        //ajout event 
-        var AddToVm = new ChoiceListViewModel(Poll, newChoice, this);
-         
-        _choicesVm.Insert(0, AddToVm);
-        ChoiceLabel = "";
-        Context.Choices.Add(newChoice);
+            //ajout event 
+            var AddToVm = new ChoiceListViewModel(Poll, newChoice, this);
 
-        RaisePropertyChanged();
-        NotifyColleagues(App.Messages.MSG_UPDATE_COMMENT, Poll);
-        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+            _choicesVm.Insert(0, AddToVm);
+            ChoiceLabel = "";
+            Context.Choices.Add(newChoice);
 
+            HasChoices();
+            RaisePropertyChanged();
+            NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+        }
     }
 
     public void EditChoice() {
+        if (validate()) {
+            // ajouter validation (if(!haserror)
+            var newChoice = new Choice { Label = ChoiceLabel };
+            // faire validation
+            Poll.Choices.Add(newChoice);
+            _choices.Add(newChoice);
 
+            //ajout event 
+            var AddToVm = new ChoiceListViewModel(Poll, newChoice, this);
 
-        // ajouter validation (if(!haserror)
-        var newChoice = new Choice { Label = ChoiceLabel };
-        // faire validation
-        Poll.Choices.Add(newChoice);
-        _choices.Add(newChoice);
+            // abonnement a l'event
+            AddToVm.Changed += () => {
+                Console.WriteLine("test");
+                ChoicesVm.Remove(AddToVm);
+            };
 
-        //ajout event 
-        var AddToVm = new ChoiceListViewModel(Poll, newChoice, this);
-
-        // abonnement a l'event
-        AddToVm.Changed += () => {
-            Console.WriteLine("test");
-            ChoicesVm.Remove(AddToVm);
-        };
-
-        _choicesVm.Insert(0, AddToVm);
-        ChoiceLabel = "";
-        Context.Choices.Update(newChoice);
-        RaisePropertyChanged();
-        NotifyColleagues(App.Messages.MSG_UPDATE_COMMENT, Poll);
-        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
-
+            _choicesVm.Insert(0, AddToVm);
+            ChoiceLabel = "";
+            Context.Choices.Update(newChoice);
+            RaisePropertyChanged();
+            NotifyColleagues(App.Messages.MSG_UPDATE_COMMENT, Poll);
+            NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
+        }
     }
 
     public void cancel() {
@@ -131,9 +139,29 @@ public class ChoiceViewModel : ViewModelCommon {
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
 
     }
-    public void SaveChoiceChanges() {
-        Context.SaveChanges();
+
+    // PARTIE VALIDATION
+    public void HasChoices() {
+        NoChoices = _choicesVm.IsNullOrEmpty();
+        RaisePropertyChanged(nameof(NoChoices));
     }
+    public bool validate() {
+        ClearErrors();
+        ValidateLabel();
+        return !HasErrors;
+
+    }
+
+    public bool ValidateLabel() {
+        if (ChoiceLabel.Length < 2) {
+            AddError(nameof(ChoiceLabel), "Too short");
+        }
+        if (Poll.Choices.Any(c => c.Label == ChoiceLabel) || _choices.Any(c => c.Label == ChoiceLabel)) {
+            AddError(nameof(ChoiceLabel),"already exist");
+        }
+        return !HasErrors;
+    }
+
 
 }
 

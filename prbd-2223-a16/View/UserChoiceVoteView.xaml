@@ -10,7 +10,7 @@
              xmlns:m="clr-namespace:MyPoll.Model"
              xmlns:media="clr-namespace:System.Windows.Media;assembly=PresentationCore"
              xmlns:f="clr-namespace:PRBD_Framework;assembly=PRBD_Framework"
-             d:DesignHeight="250" d:DesignWidth="200"
+             d:DesignHeight="200" d:DesignWidth="200"
              d:DataContext="{d:DesignInstance Type=vm:UserChoiceVoteViewModel, IsDesignTimeCreatable=True}"
              x:Name="uc">
 

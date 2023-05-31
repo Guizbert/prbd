@@ -13,7 +13,7 @@
                 mc:Ignorable="d"
                 d:DesignHeight="450" d:DesignWidth="800">
 
-    <Grid Background="AliceBlue">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
@@ -35,8 +35,8 @@
         <Grid Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto" MinHeight="371"/>
+                <RowDefinition Height="auto" MinHeight="0"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
@@ -46,14 +46,15 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Width="793" Height="371" VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal" Height="36" Grid.Row="0" Grid.Column="0">
+            <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Width="793" Height="371" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Height="46" Grid.Row="0" Grid.Column="0">
                     <Label x:Name="name" Content="Poll Name" Height="27" />
-                    <TextBox Text="{Binding Title}" Width="219" Height="19"/>
+                    <TextBox Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" Width="219" Height="19"/>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal"  Grid.Row="1" Grid.Column="0">
+                <StackPanel Orientation="Horizontal"  Grid.Row="1" Height="35" Grid.Column="0">
                     <Label x:Name="type" Content="Type"/>
-                    <ComboBox ItemsSource="{Binding getTypevalues}" SelectedItem="{Binding SelectedPollType}" Margin="10,0,0,0"/>
+                    <ComboBox ItemsSource="{Binding getTypevalues}" Height="25" SelectedItem="{Binding SelectedPollType, UpdateSourceTrigger=PropertyChanged}" Margin="10,0,0,0"
+                               IsEnabled="{Binding CanChangeType}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal"  Grid.Row="2" Grid.Column="0">
                     <Label Content="Creator" Width="53"/>
@@ -62,14 +63,14 @@
                 <StackPanel Orientation="Horizontal" Height="47" Grid.Row="3" Grid.Column="0">
                     <Label x:Name="isClosed" Content="isClosed" RenderTransformOrigin="0.483,0.747" Height="32" Width="55"/>
                     <CheckBox IsChecked="{Binding IsClosed, UpdateSourceTrigger=PropertyChanged}" Margin="15,0,0,0" Height="20" Width="19"/>
-                    <!--Modifier le checkbox avec un onclick peut-être -->
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel Orientation="Horizontal" Height="199" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="793" >
+            <StackPanel Orientation="Horizontal" Height="240" VerticalAlignment="Top" HorizontalAlignment="Center" Width="793" Margin="0,131,0,0" >
                 <StackPanel Width="328"  Grid.Column="0">
                     <Label FontWeight="Bold" FontSize="15" Content="Participants" Height="34" RenderTransformOrigin="0.555,7.939"/>
-                    <ListBox ItemsSource="{Binding UserParticipants}" SelectionMode="Single" Name="lstParticipant" SelectedItem="{Binding SelectedUserToDelete}" Height="83">
+                    <TextBlock Visibility="{Binding NoParticipant, Converter={f:BoolToVisibleConverter}}" Text="NO PARTICIPANTS" Foreground="RED"></TextBlock>
+                    <ListBox ItemsSource="{Binding UserParticipants}" SelectionMode="Single" Name="lstParticipant"  Height="83">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
@@ -91,23 +92,21 @@
                     <Button Content="Add All" Command="{Binding AddAllParticipantsCommand}" Width="314"/>
                 </StackPanel>
 
-                <StackPanel Width="343" Height="193"  Grid.Column="1">
+                <StackPanel Width="343" Height="222"  Grid.Column="1">
                     <Label FontWeight="Bold" FontSize="15" Content="Choix" Height="37"/>
-                    <!--essayer faire un user control de tout ça?-->
-                    <ScrollViewer VerticalScrollBarVisibility="Auto">
-                        <ItemsControl ItemsSource="{Binding ChoiceViewModel}" Grid.Row="4" Grid.Column="3" Grid.RowSpan="2" >
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <vw:ChoiceView />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
+                    <!--<TextBlock Grid.Row="0" Visibility="{Binding NoChoices, UpdateSourceTrigger=PropertyChanged}" Text="NO CHOICES" Foreground="RED"></TextBlock>-->
+                    <ItemsControl ItemsSource="{Binding ChoiceViewModel}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <vw:ChoiceView />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </StackPanel>
             </StackPanel>
         </Grid>
 
-        <StackPanel Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="750">
+        <StackPanel Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="750">
             <WrapPanel HorizontalAlignment="Left" Width="130" Margin="633,0,0,0">
                 <Button x:Name="btnCancel" Content="Cancel" Command="{Binding Cancel}" Width="auto" Padding="5,1" IsCancel="True"/>
                 <Button x:Name="btnSave" Content="Save" Command="{Binding Save}" Width="auto" Margin="10,0,0,0" Padding="5,1" IsDefault="True"/>

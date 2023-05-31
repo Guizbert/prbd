@@ -22,15 +22,11 @@ public class UserChoiceViewModel : ViewModelCommon
         User = user;
         RefreshVote();
 
+        _isActionVisible = !Poll.Closed && (CurrentUser == User || CurrentUser.Role == Role.Administrator);
         EditCommand = new RelayCommand(() => EditMode = true);
         SaveCommand = new RelayCommand(Save);
         CancelCommand = new RelayCommand(Cancel);
         DeleteCommand = new RelayCommand(Delete);
-        /*
-                verif ici le mode single :
-                        -> rechercher dans le gridvm dans userVm rechercher le participant courant parcourir ses choix et changer ses votes et mettre a empty
-         */
-
     }
     
     public Poll Poll { get; set ; }
@@ -50,7 +46,13 @@ public class UserChoiceViewModel : ViewModelCommon
 
     private bool _editMode;
 
-    public bool IsActionVisible => !_voteGridViewModel.Poll.Closed &&( CurrentUser == User || CurrentUser.Role == Role.Administrator);
+
+    public bool IsActionVisible {
+        get => _isActionVisible;
+        set => SetProperty(ref _isActionVisible, value);
+    }
+    private bool _isActionVisible;
+
 
     // La visbilité des boutons de sauvegarde et d'annulation sont bindés sur cette propriété
     public bool EditMode {
@@ -96,10 +98,6 @@ public class UserChoiceViewModel : ViewModelCommon
     }
 
     private void RefreshVoteDb() {
-        //VoteVM = Context.Votes
-        //   .Where(v => v.User == User && v.Choice.Poll == Poll && (v.Type == VoteType.Yes || v.Type == VoteType.No || v.Type == VoteType.Maybe || v.Type == VoteType.Empty || v == null))
-        //   .Select(v => new UserChoiceVoteViewModel(User, v.Choice, Poll))
-        //   .ToList();
 
         VoteVM = _choicesSave
             .Select(c => new UserChoiceVoteViewModel(User, c, Poll))        // mettre la vue avec les choix
@@ -153,6 +151,10 @@ public class UserChoiceViewModel : ViewModelCommon
         Context.SaveChanges();
         OnRefreshData();
 
+    }
+
+    public void Clear() {
+        VoteVM.Clear();
     }
 
     protected override void OnRefreshData() {

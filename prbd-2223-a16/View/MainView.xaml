@@ -10,7 +10,7 @@
               mc:Ignorable="d"
               WindowStartupLocation="CenterScreen"
               Title="{Binding Title}"
-              Height="900" Width="900">
+              Height="1000" Width="1000">
     <!-- faire un binding title pour faire : 'admin's polls' -->
     
 
