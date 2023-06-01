@@ -28,7 +28,6 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock FontWeight="Bold" FontSize="15" Text="{Binding Title, TargetNullValue='&lt;New Poll>'}" Grid.Column="0" />
-            <Label x:Name="creator" Content="created by " Grid.Column="1" />
             <TextBlock Text="{Binding Creator}" Grid.Column="2" />
         </Grid>
 

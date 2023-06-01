@@ -77,7 +77,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(ref _creatorId, value);
     }
     public string Creator {
-        get => $"(Created by {(CurrentUser != Poll.Creator ? Poll.Creator.FullName : CurrentUser.FullName) })";
+        get => $"Created by {(CurrentUser == Poll.Creator ? Poll.Creator.FullName : "Me (" +CurrentUser.FullName + ")")}";
     }
     private bool _isClosed;
     public bool IsClosed {

@@ -27,8 +27,10 @@ public class UserChoiceViewModel : ViewModelCommon
         SaveCommand = new RelayCommand(Save);
         CancelCommand = new RelayCommand(Cancel);
         DeleteCommand = new RelayCommand(Delete);
+
+        //Register<Vote>(App.Messages.MSG_NEWCHOICE_POLLSINGLE,Vote => Clear());
     }
-    
+
     public Poll Poll { get; set ; }
 
     private VoteGridViewModel _voteGridViewModel;

@@ -151,14 +151,16 @@ public class ChoiceViewModel : ViewModelCommon {
     public bool ValidateLabel() {
         if(string.IsNullOrEmpty(ChoiceLabel)) {
             AddError(nameof(ChoiceLabel), "Required");
+        } else {
+            if (ChoiceLabel.Length < 2) {
+                AddError(nameof(ChoiceLabel), "Too short");
+            }
+            if (Poll.Choices.Any(c => c.Label == ChoiceLabel) || _choices.Any(c => c.Label == ChoiceLabel)) {
+                ClearErrors();
+                AddError(nameof(ChoiceLabel), "already exist");
+            }
         }
-        if (ChoiceLabel.Length < 2) {
-            AddError(nameof(ChoiceLabel), "Too short");
-        }
-        if (Poll.Choices.Any(c => c.Label == ChoiceLabel) || _choices.Any(c => c.Label == ChoiceLabel)) {
-            ClearErrors();
-            AddError(nameof(ChoiceLabel),"already exist");
-        }
+        
         return !HasErrors;
     }
 
