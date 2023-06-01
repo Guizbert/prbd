@@ -66,7 +66,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         set => SetProperty(Poll.Name, value, Poll, (p, v) => {
             p.Name = v;
             Validate();
-            //NotifyColleagues(App.Messages.MSG_POLL_NAMECHANGED, Poll);
+            NotifyColleagues(App.Messages.MSG_POLL_NAMECHANGED, Poll);
             
         });
     }
@@ -76,7 +76,6 @@ internal class PollDetailViewModel : ViewModelCommon {
         get => CurrentUser.Id;
         set => SetProperty(ref _creatorId, value);
     }
-
     public string Creator {
         get => $"(Created by {(CurrentUser != Poll.Creator ? Poll.Creator.FullName : CurrentUser.FullName) })";
     }
@@ -176,6 +175,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         if (CanAddParticipant()) {
             Console.WriteLine("Ajout participant" + SelectedUser.FullName);
             UserParticipants.Add(SelectedUser); // Ajouter l'utilisateur sélectionné à la liste de participants
+            SetNbVoteUser(SelectedUser);
             HasParticipant();
         } else {
             Console.WriteLine("peut pas l'ajouter");
@@ -183,25 +183,6 @@ internal class PollDetailViewModel : ViewModelCommon {
         }
         refreshList();
     }
-
-    private void AddChoice() {
-        if (string.IsNullOrEmpty(ChoiceLabel)) {
-            // Le libellé de choix est vide ou null, ne rien faire
-            return;
-        }
-        if (Choices.Any(c => c.Label == ChoiceLabel)) {
-            return;
-        }else {
-            var newChoice = new Choice { Label = ChoiceLabel };
-         
-            Choices.Add(newChoice);
-
-            // Réinitialiser la valeur de la propriété ChoiceLabel
-            ChoiceLabel = string.Empty;
-            refreshList();
-        }
-    }
-
     private bool CanAddParticipant() {
         return SelectedUser != null && !UserParticipants.Any(p => p.Id == SelectedUser.Id); // Vérifier si l'utilisateur est sélectionné et n'est pas déjà dans la liste de participants
     }
@@ -231,7 +212,6 @@ internal class PollDetailViewModel : ViewModelCommon {
         Cancel = new RelayCommand(CancelAction);
         //Delete = new RelayCommand(DeleteAction, () => !IsNew);
 
-        AddChoiceCommand = new RelayCommand(AddChoice);
 
         AddMyselfCommand = new RelayCommand(AddMyself);
         AddAllParticipantsCommand = new RelayCommand(AddAll);
@@ -255,6 +235,7 @@ internal class PollDetailViewModel : ViewModelCommon {
     public void AddMyself() {
         if (!UserParticipants.Contains(CurrentUser)) {
             UserParticipants.Add(CurrentUser); // Ajouter l'utilisateur sélectionné à la liste de participants
+            SetNbVoteUser(CurrentUser);
             if (NoParticipant) {
                 NoParticipant = false;
                 RaisePropertyChanged(nameof(NoParticipant));
@@ -266,6 +247,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         foreach(var user in AllParticipants) {
             if (!UserParticipants.Contains(user)) {
                 UserParticipants.Add(user);
+                SetNbVoteUser(user);
             }
             HasParticipant();
 
@@ -365,7 +347,10 @@ internal class PollDetailViewModel : ViewModelCommon {
         } else {
             Poll.Reload();
             Context.Entry(Poll).Reload();
+            NotifyColleagues(App.Messages.MSG_POLL_NAMECHANGED, Poll);
+
         }
+        NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
         NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
     }
 
@@ -376,7 +361,6 @@ internal class PollDetailViewModel : ViewModelCommon {
     public override bool Validate() {
         ClearErrors();
         ValidateTitle();
-        HasChoices();
         return !HasErrors;
     }
 
@@ -385,6 +369,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         NoChoices = ChoiceViewModel.All(cvm => cvm.Choices.Count == 0);
         RaisePropertyChanged(nameof(NoChoices));
     }
+
     public void HasParticipant() {
         NoParticipant = UserParticipants.IsNullOrEmpty();
         RaisePropertyChanged(nameof(NoParticipant));

@@ -56,7 +56,7 @@
 
 
             <!-- Liste des commentaires -->
-            <StackPanel Grid.Row="4" Visibility="{Binding CanEditPoll, Converter={f:BoolToCollapsedConverter}}" IsEnabled="{Binding IsntClosed}">
+            <StackPanel Grid.Row="4" IsEnabled="{Binding IsntClosed}">
                 <StackPanel Orientation="Horizontal" Margin="22,20,50,0">
                     <TextBlock FontWeight="Bold">
                     <Run Text="Comment" FontSize="17" />
@@ -69,10 +69,6 @@
                     <TextBox Text="{Binding TextToAdd, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding AddComment, Converter={f:BoolToVisibleConverter}}" Margin="171,0,106,0" Width="212" Height="18"/>
                     <Button Content="Add" Command="{Binding AddCommentCommand}"  Visibility="{Binding AddComment, Converter={f:BoolToVisibleConverter}}" Margin="5,0"  />
                 </StackPanel>
-
-
-
-
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="407*"/>

@@ -175,7 +175,7 @@ public class UserChoiceVoteViewModel : ViewModelCommon
     };
 
     Brush GetVoteColor() {
-        Console.WriteLine("yes ? : " + HasVotedYes + "\n" + "Maybe : " + HasVotedMaybe + "\n No : " + HasVotedNo);
+        //Console.WriteLine("yes  : " + HasVotedYes + "\n" + "Maybe : " + HasVotedMaybe + "\n No : " + HasVotedNo);
         if (HasVotedYes) return Brushes.Green;
         if (HasVotedMaybe) return Brushes.OrangeRed;
         if (HasVotedNo) return Brushes.Red;
