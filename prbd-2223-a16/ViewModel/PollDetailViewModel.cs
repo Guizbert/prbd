@@ -78,7 +78,7 @@ internal class PollDetailViewModel : ViewModelCommon {
     }
 
     public string Creator {
-        get => $"(Created by {CurrentUser.FullName})";
+        get => $"(Created by {(CurrentUser != Poll.Creator ? Poll.Creator.FullName : CurrentUser.FullName) })";
     }
     private bool _isClosed;
     public bool IsClosed {
@@ -134,6 +134,7 @@ internal class PollDetailViewModel : ViewModelCommon {
         get => _choices;
         set => SetProperty(ref _choices, value);
     }
+
     private bool _noParticipant;
     public bool NoParticipant {
         get => _noParticipant;
@@ -217,11 +218,11 @@ internal class PollDetailViewModel : ViewModelCommon {
         HasParticipant();
         SetNbVoteUser();
 
-        Console.WriteLine(NoParticipant + " NO PARTICIPANT ?????");
-        Console.WriteLine(NoChoices + " NO CHOICES ?????");
-
         var listChoice = new ChoiceViewModel(Poll);
         ChoiceViewModel.Add(listChoice);
+
+
+        //HasChoices();
 
         IsClosed = Poll.Closed;
         SelectedPollType = Poll.Type;
@@ -323,18 +324,15 @@ internal class PollDetailViewModel : ViewModelCommon {
                 //Poll.Choices = Choices;
                 Poll.Closed = IsClosed;
                 Poll.Type = SelectedPollType;
-                Poll.Choices = Choices;
                 Context.Update(Poll);
             }
 
             Context.SaveChanges();
 
-            NotifyColleagues(ApplicationBaseMessages.MSG_REFRESH_DATA);
             NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
             NotifyColleagues(App.Messages.MSG_CLOSE_TAB, Poll);
-            NotifyColleagues(App.Messages.MSG_CLOSE_TAB, null);
         }
-       
+
     }
 
     private bool CanSaveAction() {
@@ -382,13 +380,10 @@ internal class PollDetailViewModel : ViewModelCommon {
         return !HasErrors;
     }
 
-    public bool HasChoices() {
-        foreach (var cvm in ChoiceViewModel) {
-            if (cvm.Choices.Count < 2) {
-                return false;
-            }
-        }
-        return true;
+    public void HasChoices() {
+        Console.WriteLine(ChoiceViewModel.All(cvm => cvm.Choices.Count == 0));
+        NoChoices = ChoiceViewModel.All(cvm => cvm.Choices.Count == 0);
+        RaisePropertyChanged(nameof(NoChoices));
     }
     public void HasParticipant() {
         NoParticipant = UserParticipants.IsNullOrEmpty();

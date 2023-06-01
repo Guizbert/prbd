@@ -94,7 +94,7 @@
 
                 <StackPanel Width="343" Height="222"  Grid.Column="1">
                     <Label FontWeight="Bold" FontSize="15" Content="Choix" Height="37"/>
-                    <!--<TextBlock Grid.Row="0" Visibility="{Binding NoChoices, UpdateSourceTrigger=PropertyChanged}" Text="NO CHOICES" Foreground="RED"></TextBlock>-->
+                    <!--<TextBlock Grid.Row="0" Visibility="{Binding NoChoices,Converter={f:BoolToVisibleConverter}}" Text="NO CHOICES" Foreground="RED"></TextBlock>-->
                     <ItemsControl ItemsSource="{Binding ChoiceViewModel}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>

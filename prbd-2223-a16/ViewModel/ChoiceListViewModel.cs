@@ -87,13 +87,24 @@ public class ChoiceListViewModel : ViewModelCommon {
 
     private void Save() {
         Console.WriteLine(_choiceVM.ChoicesVm.Any(c => c.Label == Label && c != this));
-        if (_choiceVM.ChoicesVm.Any(c => c.Label == Label && c != this)) {
-            AddError(nameof(Label), "Already exist");
-        } else {
+        if (Validate()) {
             Choice.Label = Label;
             EditMode = false;
             ClearErrors();
         }
+    }
+
+    public override bool Validate() {
+        ClearErrors();
+        ValidateLabel();
+        return !HasErrors;
+    }
+    public bool ValidateLabel() {
+        if (_choiceVM.ChoicesVm.Any(c => c.Label == Label && c != this)) {
+            AddError(nameof(Label), "Already exist");
+        } else if (Label.Length < 2)
+            AddError(nameof(Label), "Too short");
+        return !HasErrors;
     }
 
     private void Cancel() {
@@ -104,6 +115,7 @@ public class ChoiceListViewModel : ViewModelCommon {
        // RefreshChoice();
         //Changed?.Invoke(); // déclenche l'event. le ? pour check si l'event est null
         Dispose();
+        ClearErrors();
         RaisePropertyChanged(nameof(Label));
     }
 

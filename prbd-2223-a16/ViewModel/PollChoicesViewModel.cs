@@ -117,11 +117,7 @@ internal class PollChoicesViewModel : ViewModelCommon{
     }
 
     public void refreshComm() {
-        
-        Console.WriteLine(AddComment);
-        foreach(var comm in Commentaire) {
-            Console.WriteLine(comm.Text);
-        }
+        Commentaire = new ObservableCollection<Comment>(Poll.commentaires.OrderBy(c => c.Timestamp).Reverse());
         RaisePropertyChanged(nameof(Commentaire));
     }
     // editAction et CanDoAction
@@ -130,9 +126,7 @@ internal class PollChoicesViewModel : ViewModelCommon{
     public bool CanDoAction =>  CurrentUser == Poll.Creator || CurrentUser.Role == Role.Administrator;
 
 
-    public bool CanDeleteComment(Comment comment) {
-        return Commentaire.Where(c => c == comment && c.Creator == CurrentUser).Any();
-    }
+
 
 
     // DeleteAction
@@ -149,16 +143,10 @@ internal class PollChoicesViewModel : ViewModelCommon{
         //CancelAction();
     }
     private void DeleteCommentAction(Comment comment) {
-        Console.WriteLine(CanDeleteComment(comment));
-       // var canDelete = Commentaire.Where(c => c == comment && c.Creator == CurrentUser || CurrentUser.Role == Role.Administrator).Any();
-
-       // if (canDelete) {
             Commentaire.Remove(comment);
             Context.Remove(comment);
             Poll.commentaires.Remove(comment);
-            Context.SaveChanges();  
-       // }
-              
+            Context.SaveChanges();
     }
 
 
@@ -168,7 +156,7 @@ internal class PollChoicesViewModel : ViewModelCommon{
         if (Poll.commentaires == null) {
             Commentaire = new ObservableCollection<Comment>();
         }else {
-            Commentaire = new ObservableCollection<Comment>(Poll.commentaires.OrderBy(c => c.Timestamp));
+            Commentaire = new ObservableCollection<Comment>(Poll.commentaires.OrderBy(c => c.Timestamp).Reverse());
         }
         Edit = new RelayCommand( () => {
             PollDetailViewModel = new PollDetailView(poll, isNew);
@@ -179,9 +167,6 @@ internal class PollChoicesViewModel : ViewModelCommon{
         AddCommentCommand = new RelayCommand(AddCommentAction);
         ShowTextBoxCommand = new RelayCommand(ShowTextBox);
         ReOpenCommand = new RelayCommand(ReOpenPoll);
-
-        Console.WriteLine(IsCreator + " Is Creator ? <--------");
-        Console.WriteLine(AddComment + " I AddComment ? <--------");
     }
 
 

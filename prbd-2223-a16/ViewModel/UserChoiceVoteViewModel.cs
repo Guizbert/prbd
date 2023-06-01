@@ -25,7 +25,7 @@ public class UserChoiceVoteViewModel : ViewModelCommon
             var max = Poll.Type == PollType.Single ? 1 : 0;
             if (CurrentUser.Id == user.Id || CurrentUser.Role == Role.Administrator ) {
                 if (max == 1) {
-                    ChangeVotePollSingle(voteType);
+                     ChangeVotePollSingle(voteType);
                         //NotifyColleagues(App.Messages.MSG_NEWCHOICE_POLLSINGLE, voteType);
                         // Si le nombre maximum de votes est 1 et le vote est déjà effectué par l'utilisateur, ne rien faire.
                         //p'tetre faire un notify colleague pour delete les votes
@@ -43,21 +43,30 @@ public class UserChoiceVoteViewModel : ViewModelCommon
             HasVotedNo = Vote.Type == VoteType.No;
             HasVotedYes = Vote.Type == VoteType.Yes;
             HasVotedMaybe = Vote.Type == VoteType.Maybe;
+            Console.WriteLine(VoteColor + "   color a afficher quand on edit ");
             //NoVote = Vote.Type == VoteType.Empty; 
             RaisePropertyChanged(nameof(GetCurrentIcon));
             RaisePropertyChanged(nameof(GetCurrentChoiceColor));
+                
         });
+        _voteColor = GetVoteColor();
+        RaisePropertyChanged(nameof(VoteColor));
+
         Console.WriteLine(ChangeVote);
         Console.WriteLine(GetCurrentIcon + "  <------------- CURRENTCOLOR ");
+
         NotifyColleagues(App.Messages.MSG_UPDATE_POLL, Poll);
-
-
         HasVoted = user.Votes.Any(v => v.Choice.Id == choice.Id);
     }
     public ICommand ChangeVote { get; set; }
 
     public Poll Poll { get; set; }
     public Vote Vote { get;  set; }
+
+    Brush _voteColor;
+
+    public Brush VoteColor => GetVoteColor();
+
     public UserChoiceVoteViewModel() { }
 
 
@@ -78,12 +87,11 @@ public class UserChoiceVoteViewModel : ViewModelCommon
     }
     private void ChangeVotePollSingle(VoteType type) {
         if (VoteGridVm == null) VoteGridVm = new VoteGridViewModel(Poll);
-        if(Vote != null) {
-            if (type == VoteType.Empty)
-                Context.Remove(Vote);
-            else
-                Vote.Type = type;
-        }
+        if (type == VoteType.Empty)
+            return;
+        else
+            Vote.Type = type;
+        
                 
         NotifyColleagues(App.Messages.MSG_UPDATE_VOTE, VoteGridVm);
 
@@ -165,6 +173,15 @@ public class UserChoiceVoteViewModel : ViewModelCommon
         VoteType.Maybe => EFontAwesomeIcon.Solid_CircleQuestion,
         _ => EFontAwesomeIcon.None,
     };
+
+    Brush GetVoteColor() {
+        Console.WriteLine("yes ? : " + HasVotedYes + "\n" + "Maybe : " + HasVotedMaybe + "\n No : " + HasVotedNo);
+        if (HasVotedYes) return Brushes.Green;
+        if (HasVotedMaybe) return Brushes.OrangeRed;
+        if (HasVotedNo) return Brushes.Red;
+        else
+            return Brushes.Gray;
+    }
 
     public Brush GetCurrentChoiceColor => Vote.Type switch {
         VoteType.Yes => Brushes.Green,

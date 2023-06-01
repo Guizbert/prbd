@@ -23,12 +23,10 @@ public class ChoiceViewModel : ViewModelCommon {
 
     /* ==================================== CONSTRUCTEUR ====================================*/
     public ChoiceViewModel(Poll poll) {
-       // _choices = new ObservableCollectionFast<Choice>(poll.Choices.OrderBy(c => c.Label).ToList());
         _choices = new ObservableCollectionFast<Choice>(poll.Choices.OrderBy(c => c.Label));
         Poll = poll;
         HasChoices();
         _choicesVm = new ObservableCollectionFast<ChoiceListViewModel>(_choices.Select(c =>  new ChoiceListViewModel(poll, c, this)));
-        //_choicesVm = new ObservableCollectionFast<ChoiceListViewModel>(poll, c, this);
 
         AddChoiceCommand = new RelayCommand(AddChoice);
     }
@@ -94,9 +92,7 @@ public class ChoiceViewModel : ViewModelCommon {
 
     public void EditChoice() {
         if (validate()) {
-            // ajouter validation (if(!haserror)
             var newChoice = new Choice { Label = ChoiceLabel };
-            // faire validation
             Poll.Choices.Add(newChoice);
             _choices.Add(newChoice);
 
@@ -153,10 +149,14 @@ public class ChoiceViewModel : ViewModelCommon {
     }
 
     public bool ValidateLabel() {
+        if(string.IsNullOrEmpty(ChoiceLabel)) {
+            AddError(nameof(ChoiceLabel), "Required");
+        }
         if (ChoiceLabel.Length < 2) {
             AddError(nameof(ChoiceLabel), "Too short");
         }
         if (Poll.Choices.Any(c => c.Label == ChoiceLabel) || _choices.Any(c => c.Label == ChoiceLabel)) {
+            ClearErrors();
             AddError(nameof(ChoiceLabel),"already exist");
         }
         return !HasErrors;

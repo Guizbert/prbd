@@ -28,7 +28,9 @@
 
                 <!-- Bouton de vote "Oui" -->
                 <Button Padding="2" BorderBrush="Transparent" Background="Transparent" Width="32"
-                    Command="{Binding ChangeVote}" CommandParameter="{x:Static m:VoteType.Yes}" Height="31">
+                        Command="{Binding ChangeVote}"
+                        CommandParameter="{x:Static m:VoteType.Yes}" Height="31"
+                        Foreground="{Binding VoteColor}">
                     <fa:FontAwesome Icon="Solid_Check"
                                 Foreground="{c:Binding 'HasVotedYes ? media:Brushes.Green : media:Brushes.LightGray'}"
                                 ToolTip="Yes"
@@ -36,7 +38,9 @@
                 </Button>
                 <!-- Bouton de vote "Peut-être" -->
                 <Button Padding="2" BorderBrush="Transparent" Background="Transparent" Width="32" 
-                    Command="{Binding ChangeVote}" CommandParameter="{x:Static m:VoteType.Maybe}" Height="34">
+                        Command="{Binding ChangeVote}"
+                        CommandParameter="{x:Static m:VoteType.Maybe}" Height="31"
+                        Foreground="{Binding VoteColor}">
                     <fa:FontAwesome Icon="Solid_CircleQuestion" 
                                 Foreground="{c:Binding 'HasVotedMaybe ? media:Brushes.OrangeRed : media:Brushes.LightGray'}"
                                 ToolTip="Maybe"
@@ -45,7 +49,9 @@
 
                 <!-- Bouton de vote "Non" -->
                 <Button Padding="2" BorderBrush="Transparent" Background="Transparent" Width="32" Margin="-90,60,1,1"
-                    Command="{Binding ChangeVote}" CommandParameter="{x:Static m:VoteType.No}">
+                        Command="{Binding ChangeVote}"
+                        CommandParameter="{x:Static m:VoteType.No}"
+                        Foreground="{Binding VoteColor}">       <!--devait return la couleur du vote si non null-->
                     <fa:FontAwesome Icon="Solid_Xmark"
                                 Foreground="{c:Binding 'HasVotedNo ? media:Brushes.Red : media:Brushes.LightGray'}"
                                 ToolTip="No"
