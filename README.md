@@ -8,7 +8,6 @@
   * bug 2 : un bug peut survenir quand on clique sur un poll une fois et qu'on clique a l'exterieur (j'ai eu ce problème que deux fois et n'arrive pas a le reproduire. le bug dit que le poll est null)
   * bug 3 : 
   * bug 4 : 
-  * bug 5 : 
   * ...
 
 ### Liste des fonctionnalités supplémentaires
