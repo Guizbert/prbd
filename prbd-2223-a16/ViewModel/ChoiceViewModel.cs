@@ -25,7 +25,6 @@ public class ChoiceViewModel : ViewModelCommon {
     public ChoiceViewModel(Poll poll) {
         _choices = new ObservableCollectionFast<Choice>(poll.Choices.OrderBy(c => c.Label));
         Poll = poll;
-        HasChoices();
         _choicesVm = new ObservableCollectionFast<ChoiceListViewModel>(_choices.Select(c =>  new ChoiceListViewModel(poll, c, this)));
 
         AddChoiceCommand = new RelayCommand(AddChoice);

@@ -7,7 +7,8 @@ namespace MyPoll.View;
 public partial class MainView : WindowBase {
     public MainView() {
         InitializeComponent();
-        Console.WriteLine(polls);
+        Register<User>(App.Messages.MSG_ADMIN,
+          user => DoDisplayUser(user));
 
         Register<Poll>(App.Messages.MSG_CREATE_POLL,
             poll => DoDisplayPoll(poll, true));
@@ -39,6 +40,9 @@ public partial class MainView : WindowBase {
 
     private void DoDisplayPoll(Poll poll, bool isNew) {
             OpenTab(isNew ? "<New Poll>" : poll.Name, poll.Name,() => new PollDetailView(poll, isNew));
+    }
+    private void DoDisplayUser(User user) {
+            OpenTab(user.FullName, user.FullName, () => new AdminView(user));
     }
     private void DoDisplayPollElements(Poll poll, bool isNew) {
         if(poll != null) {

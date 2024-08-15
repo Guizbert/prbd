@@ -23,22 +23,30 @@ public class PollsViewModel : ViewModelCommon
     public ICommand ClearFilter { get; set; }
     public ICommand ApplyFilter { get; set; }
     public ICommand NewPoll{ get; set;}
+    public ICommand AdminView{ get; set;}
     public ICommand DisplayPollsDetails { get; set;}
 
 
+    public User User { get; set; }
+    public bool UserIsAdmin {get => !User.isAdmin(); }
 
     public PollsViewModel() : base() {
         getPolls(); OnRefreshData();
 
         ApplyFilter = new RelayCommand(ApplyFilterAction);
         ClearFilter = new RelayCommand(() => Filter = "");
+        User = CurrentUser;
         NewPoll = new RelayCommand(() => {
             NotifyColleagues(App.Messages.MSG_CREATE_POLL, new Poll());
+        });
+        AdminView = new RelayCommand(() => {
+            NotifyColleagues(App.Messages.MSG_ADMIN, User);
         });
         DisplayPollsDetails = new RelayCommand<PollsCardViewModel>(pc => {
             if(pc != null)
                 NotifyColleagues(App.Messages.MSG_CHOICE_POLL, pc.Poll);
         });
+        
         Register<Poll>(App.Messages.MSG_UPDATE_POLL, poll => OnRefreshData());
     }
 
@@ -50,7 +58,6 @@ public class PollsViewModel : ViewModelCommon
             polls.Select(p => new PollsCardViewModel(p)));
     }
     private void ApplyFilterAction() {
-
         if (!string.IsNullOrEmpty(Filter)) {
             IQueryable<Poll> query = Context.Polls;
             if (!CurrentUser.isAdmin()) // vérifiez si l'utilisateur est un administrateur

@@ -110,6 +110,20 @@ public class Poll : EntityBase<MyPollContext> {
             return allPolls;
         }
     }
+    public static IQueryable<Poll> GetPollsWhereCreator(User CurrentUser) {
+        
+        var allPolls = (Context.Polls
+        .Where(poll => poll.Creator.Email.Contains(CurrentUser.Email))
+        .OrderBy(poll => poll.Name));
+        return allPolls;
+        
+    }
+    public static IQueryable<Poll> GetPollsWhereParticipant(User CurrentUser) {
+        var allPolls = (Context.Polls
+        .Where(poll => poll.Participants.Contains(CurrentUser))
+        .OrderBy(poll => poll.Name));
+        return allPolls;
+    }
     public static PollType[] getTypes() {
         return Enum.GetValues(typeof(PollType)).Cast<PollType>().ToArray();
     }

@@ -23,6 +23,7 @@ public partial class App : ApplicationBase<User, MyPollContext > {
         MSG_DELETE_CHOICE,
         MSG_NEWCHOICE_POLLSINGLE,
         MSG_REFRESH_WINDOW,
+        MSG_ADMIN,
 
         MSG_CREATE_COMMENT,         // création commentaire
         MSG_DELETE_COMMENT,         // supprimer commentaire
